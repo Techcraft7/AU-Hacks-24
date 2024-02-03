@@ -5,7 +5,7 @@ public sealed class Game
 	public Map Map { get; set; } = new();
 	public Player[] Players { get; set; } = new Player[4];
 	public int CurrentPlayer => (turnIndex % Players.Length) + 1;
-	public bool IsInSetup => turnIndex < Players.Length * 2;
+	public bool IsInSetup => turnIndex < Players.Length;
 	private int turnIndex = 0;
 
 	public Game()
