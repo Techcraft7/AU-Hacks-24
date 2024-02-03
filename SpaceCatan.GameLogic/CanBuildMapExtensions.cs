@@ -1,6 +1,6 @@
 ﻿namespace SpaceCatan.GameLogic;
 
-public static class MapExtensions
+public static class CanBuildMapExtensions
 {
 	public static bool CanBuildColonyAt(this Map map, int x, int y, int player)
 	{
