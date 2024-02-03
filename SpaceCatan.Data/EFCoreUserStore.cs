@@ -20,7 +20,7 @@ public sealed class EFCoreUserStore(SpaceCatanContext context) : IUserStore
 		User user = new()
 		{
 			ID = userID,
-			CurrentGame = null,
+			CurrentLobby = null,
 			Wins = 0
 		};
 
@@ -60,7 +60,7 @@ public sealed class EFCoreUserStore(SpaceCatanContext context) : IUserStore
 			return null;
 		}
 		current.Wins = user.Wins;
-		current.CurrentGame = user.CurrentGame;
+		current.CurrentLobby = user.CurrentLobby;
 		
 		try
 		{
