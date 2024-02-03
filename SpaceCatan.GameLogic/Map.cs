@@ -16,14 +16,14 @@ public sealed class Map
         planets[2, 4] = new Planet(PlanetKind.OUTPOST, 0);
         planets[4, 2] = new Planet(PlanetKind.OUTPOST, 0);
         // 4 of each resource, 1 empty
-        var poolOfResources = new List<PlanetKind>() {
+        Span<PlanetKind> pool = [
             PlanetKind.FOOD,PlanetKind.FOOD,PlanetKind.FOOD,PlanetKind.FOOD,
             PlanetKind.WATER,PlanetKind.WATER,PlanetKind.WATER,PlanetKind.WATER,
             PlanetKind.OXYGEN,PlanetKind.OXYGEN,PlanetKind.OXYGEN,PlanetKind.OXYGEN,
             PlanetKind.COBALT,PlanetKind.COBALT,PlanetKind.COBALT,PlanetKind.COBALT,
             PlanetKind.GRAVITRONIUM,PlanetKind.GRAVITRONIUM,PlanetKind.GRAVITRONIUM,PlanetKind.GRAVITRONIUM,
             PlanetKind.EMPTY
-        };
+        ];
         
         // randomly generate board layout
         for (int y = 0; y < 5; y++)
@@ -32,9 +32,10 @@ public sealed class Map
             {
                 if (GetPlanet(x, y).Kind != PlanetKind.OUTPOST)
                 {
-                    int next = rand.Next(poolOfResources.Count);
-                    planets[x, y] = new Planet(poolOfResources.ElementAt(next), 0);
-                    poolOfResources.RemoveAt(next);
+                    int i = rand.Next(pool.Length);
+                    planets[x, y] = new(pool[i], 0);
+                    pool[i] = pool[^1];
+                    pool = pool[..^1];
                 }
             }   
         }
