@@ -1,5 +1,6 @@
 using Auth0.AspNetCore.Authentication;
 using SpaceCatan.Components;
+using SpaceCatan.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,5 +22,6 @@ app.UseAuthorization();
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>();
+app.MapLoginEndpoints();
 
 app.Run();
