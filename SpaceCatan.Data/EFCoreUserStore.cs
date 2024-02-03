@@ -7,6 +7,16 @@ public sealed class EFCoreUserStore(SpaceCatanContext context) : IUserStore
 {
 	public async Task<(User, Exception?)> CreateUser(string userID, CancellationToken cancellationToken)
 	{
+		(User? existing, Exception? error) = await GetUser(userID, cancellationToken);
+		if (error is not null)
+		{
+			return (null!, error);
+		}
+		if (existing is not null)
+		{
+			return (existing, null);
+		}
+
 		User user = new()
 		{
 			ID = userID,
