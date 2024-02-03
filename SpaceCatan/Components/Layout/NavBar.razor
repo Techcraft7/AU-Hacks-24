@@ -1,4 +1,6 @@
-﻿<nav class="navbar is-fixed-top is-dark">
+﻿@using Microsoft.AspNetCore.Authentication
+
+<nav class="navbar is-fixed-top is-dark">
 	<div class="navbar-brand">
 		<a class="navbar-item" href="/">
 			LOGO
@@ -26,3 +28,12 @@
 		</div>
 	</div>
 </nav>
+
+@code {
+	[CascadingParameter]
+	public HttpContext? HttpContext { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+	}
+}
