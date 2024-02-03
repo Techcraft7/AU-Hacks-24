@@ -1,4 +1,6 @@
-﻿namespace SpaceCatan.GameLogic;
+﻿using System.Collections;
+
+namespace SpaceCatan.GameLogic;
 
 public sealed class Map
 {
@@ -7,9 +9,61 @@ public sealed class Map
 
     public Map()
     {
-        // TODO: fill planets array (place outposts on edge)s
-        // TODO: init roads to 0
-        // TODO: set out of bounds roads to null
+        var rand = new Random();
+        // center of each edge is guaranteed outpost
+        planets[0, 2] = new Planet(PlanetKind.OUTPOST, 0);
+        planets[2, 0] = new Planet(PlanetKind.OUTPOST, 0);
+        planets[2, 4] = new Planet(PlanetKind.OUTPOST, 0);
+        planets[4, 2] = new Planet(PlanetKind.OUTPOST, 0);
+        // 4 of each resource, 1 empty
+        Span<PlanetKind> pool = [
+            PlanetKind.FOOD,PlanetKind.FOOD,PlanetKind.FOOD,PlanetKind.FOOD,
+            PlanetKind.WATER,PlanetKind.WATER,PlanetKind.WATER,PlanetKind.WATER,
+            PlanetKind.OXYGEN,PlanetKind.OXYGEN,PlanetKind.OXYGEN,PlanetKind.OXYGEN,
+            PlanetKind.COBALT,PlanetKind.COBALT,PlanetKind.COBALT,PlanetKind.COBALT,
+            PlanetKind.GRAVITRONIUM,PlanetKind.GRAVITRONIUM,PlanetKind.GRAVITRONIUM,PlanetKind.GRAVITRONIUM,
+            PlanetKind.EMPTY
+        ];
+        
+        // randomly generate board layout
+        for (int y = 0; y < 5; y++)
+        {
+            for (int x = 0; x < 5; x++)
+            {
+                if (GetPlanet(x, y).Kind != PlanetKind.OUTPOST)
+                {
+                    int i = rand.Next(pool.Length);
+                    planets[x, y] = new(pool[i], 0);
+                    pool[i] = pool[^1];
+                    pool = pool[..^1];
+                }
+            }   
+        }
+
+        // initialize roads to unowned, null roads go out of bounds
+        for (int y = 0; y < 5; y++)
+        {
+            for (int x = 0; x < 5; x++) 
+            {
+                roads[x, y].Left = 0;
+                roads[x, y].Right = 0;
+                roads[x, y].Up = 0;
+                roads[x, y].Down = 0;
+                if (x <= 0) {
+                    roads[x, y].Left = null;
+                }
+                if (x >= 4) {
+                    roads[x, y].Right = null;
+                }
+                if (y <= 0) {
+                    roads[x, y].Up = null;
+                }
+                if (y >= 4) {
+                    roads[x, y].Down = null;
+                }
+            }
+        }
+
     }
 
     public Planet GetPlanet(int x, int y)
