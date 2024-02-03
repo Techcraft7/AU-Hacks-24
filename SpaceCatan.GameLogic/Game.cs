@@ -26,7 +26,15 @@ public sealed class Game
 		}
 		Player p = Players[playerID - 1];
 
-		// TODO: check 
+		// TODO: count resources after trading
+
+		// TODO: count resources for roads
+		// TODO: count resources for colonies
+
+		// TODO: add/subtract resources
+
+		// TODO: build roads and colonies
+		// TODO: apply development cards
 
 		turnIndex++;
 	}
