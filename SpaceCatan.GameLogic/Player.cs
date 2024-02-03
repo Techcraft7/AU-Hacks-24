@@ -1,21 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace SpaceCatan.GameLogic;
 
-namespace SpaceCatan.GameLogic {
-    public class Player {
-
-        private readonly int playerID;
-        private string guID;
-        public Player(int i) {
-            playerID = i;
-        }
-
-        public int GetPlayerID() {
-            return playerID;
-        }
-
-    }
-}
+public record struct Player(int ID, int Gravitronium, int Cobalt, int Oxygen, int Food, int Water);
