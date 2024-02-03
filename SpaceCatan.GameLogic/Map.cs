@@ -1,6 +1,4 @@
-﻿using System.Collections;
-
-namespace SpaceCatan.GameLogic;
+﻿namespace SpaceCatan.GameLogic;
 
 public sealed class Map
 {
@@ -11,18 +9,18 @@ public sealed class Map
     {
         var rand = new Random();
         // center of each edge is guaranteed outpost
-        planets[0, 2] = new Planet(PlanetKind.OUTPOST, 0);
-        planets[2, 0] = new Planet(PlanetKind.OUTPOST, 0);
-        planets[2, 4] = new Planet(PlanetKind.OUTPOST, 0);
-        planets[4, 2] = new Planet(PlanetKind.OUTPOST, 0);
+        planets[0, 2] = new Planet(PlanetKind.OUTPOST, 0, 0);
+        planets[2, 0] = new Planet(PlanetKind.OUTPOST, 0, 0);
+        planets[2, 4] = new Planet(PlanetKind.OUTPOST, 0, 0);
+        planets[4, 2] = new Planet(PlanetKind.OUTPOST, 0, 0);
         // 4 of each resource, 1 empty
-        Span<PlanetKind> pool = [
-            PlanetKind.FOOD,PlanetKind.FOOD,PlanetKind.FOOD,PlanetKind.FOOD,
-            PlanetKind.WATER,PlanetKind.WATER,PlanetKind.WATER,PlanetKind.WATER,
-            PlanetKind.OXYGEN,PlanetKind.OXYGEN,PlanetKind.OXYGEN,PlanetKind.OXYGEN,
-            PlanetKind.COBALT,PlanetKind.COBALT,PlanetKind.COBALT,PlanetKind.COBALT,
-            PlanetKind.GRAVITRONIUM,PlanetKind.GRAVITRONIUM,PlanetKind.GRAVITRONIUM,PlanetKind.GRAVITRONIUM,
-            PlanetKind.EMPTY
+        Span<(PlanetKind, int)> pool = [
+            (PlanetKind.FOOD, 1), (PlanetKind.FOOD, 2) , (PlanetKind.FOOD, 3 ), (PlanetKind.FOOD, 4),
+            (PlanetKind.WATER, 1), (PlanetKind.WATER, 2) , (PlanetKind.WATER, 3 ), (PlanetKind.WATER, 4),
+            (PlanetKind.OXYGEN, 1), (PlanetKind.OXYGEN, 2) , (PlanetKind.OXYGEN, 3 ), (PlanetKind.OXYGEN, 4),
+            (PlanetKind.COBALT, 1), (PlanetKind.COBALT, 2) , (PlanetKind.COBALT, 3 ), (PlanetKind.COBALT, 4),
+            (PlanetKind.GRAVITRONIUM, 1), (PlanetKind.GRAVITRONIUM, 2) , (PlanetKind.GRAVITRONIUM, 3 ), (PlanetKind.GRAVITRONIUM, 4),
+            (PlanetKind.EMPTY, 0)
         ];
         
         // randomly generate board layout
@@ -33,7 +31,8 @@ public sealed class Map
                 if (GetPlanet(x, y).Kind != PlanetKind.OUTPOST)
                 {
                     int i = rand.Next(pool.Length);
-                    planets[x, y] = new(pool[i], 0);
+                    var (kind, number) = pool[i];
+					planets[x, y] = new(kind, number, 0);
                     pool[i] = pool[^1];
                     pool = pool[..^1];
                 }
