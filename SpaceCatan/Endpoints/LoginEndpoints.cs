@@ -16,6 +16,15 @@ public static class LoginEndpoints
 
 			await ctx.ChallengeAsync(Auth0Constants.AuthenticationScheme, properties);
 		});
+		app.MapGet("/signup", async (string? redirectUri, HttpContext ctx) =>
+		{
+			var properties = new LoginAuthenticationPropertiesBuilder()
+				.WithRedirectUri(redirectUri ?? "/")
+				.WithParameter("screen_hint", "signup")
+				.Build();
+
+			await ctx.ChallengeAsync(Auth0Constants.AuthenticationScheme, properties);
+		});
 		app.MapGet("/logout", async (HttpContext ctx) =>
 		{
 			var properties = new LoginAuthenticationPropertiesBuilder()
