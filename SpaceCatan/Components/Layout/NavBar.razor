@@ -1,6 +1,4 @@
-﻿@using Microsoft.AspNetCore.Authentication
-
-<nav class="navbar is-fixed-top is-dark">
+﻿<nav class="navbar is-fixed-top is-dark">
 	<div class="navbar-brand">
 		<a class="navbar-item" href="/">
 			LOGO
@@ -21,6 +19,9 @@
 				</Authorized>
 				<NotAuthorized>
 					<div class="navbar-item">
+						<a class="button is-success" href="/signup">Signup</a>
+					</div>
+					<div class="navbar-item">
 						<a class="button" href="/login?redirectUri=/">Login</a>
 					</div>
 				</NotAuthorized>
@@ -28,12 +29,3 @@
 		</div>
 	</div>
 </nav>
-
-@code {
-	[CascadingParameter]
-	public HttpContext? HttpContext { get; set; }
-
-	protected override async Task OnInitializedAsync()
-	{
-	}
-}
