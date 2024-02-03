@@ -10,4 +10,8 @@
     <PackageReference Include="Auth0.AspNetCore.Authentication" Version="1.4.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SpaceCatan.GameLogic\SpaceCatan.GameLogic.csproj" />
+  </ItemGroup>
+
 </Project>
