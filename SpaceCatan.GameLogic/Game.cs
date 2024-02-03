@@ -19,9 +19,20 @@ public sealed class Game
 		}
 	}
 
+	public void MakeSetupTurn(int playerID, SetupTurn turn)
+	{
+		if (!IsInSetup || playerID < 1 || playerID > 4)
+		{
+			return;
+		}
+
+		Map.SetPlanetOwner(turn.X, turn.Y, playerID);
+		Map.SetRoad(turn.X, turn.Y, turn.Direction, playerID);
+	}
+
 	public void MakeTurn(int playerID, Turn turn)
 	{
-		if (playerID < 1 ||  playerID > 4)
+		if (IsInSetup || playerID < 1 ||  playerID > 4)
 		{
 			return;
 		}
