@@ -9,8 +9,6 @@ public sealed class Map
 
     public Map()
     {
-        // TODO: init roads to 0
-        // TODO: set out of bounds roads to null
         var rand = new Random();
         // center of each edge is guaranteed outpost
         planets[0, 2] = new Planet(PlanetKind.OUTPOST, 0);
@@ -27,6 +25,7 @@ public sealed class Map
             PlanetKind.EMPTY
         };
         
+        // randomly generate board layout
         for (int y = 0; y < 5; y++)
         {
             for (int x = 0; x < 5; x++)
@@ -38,6 +37,30 @@ public sealed class Map
                     poolOfResources.RemoveAt(next);
                 }
             }   
+        }
+
+        // initialize roads to unowned, null roads go out of bounds
+        for (int y = 0; y < 5; y++)
+        {
+            for (int x = 0; x < 5; x++) 
+            {
+                roads[x, y].Left = 0;
+                roads[x, y].Right = 0;
+                roads[x, y].Up = 0;
+                roads[x, y].Down = 0;
+                if (x <= 0) {
+                    roads[x, y].Left = null;
+                }
+                if (x >= 4) {
+                    roads[x, y].Right = null;
+                }
+                if (y <= 0) {
+                    roads[x, y].Up = null;
+                }
+                if (y >= 4) {
+                    roads[x, y].Down = null;
+                }
+            }
         }
 
     }

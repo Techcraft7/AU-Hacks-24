@@ -77,5 +77,83 @@ namespace SpaceCatan.GameLogic.Tests
                 }
             }
         }
+
+
+        [Fact]
+        public void InitializeMap_CheckIfTopEdgeRoadsHaveNulls() {
+            var mapTest = new Map();
+            for (int x = 0; x < 5; x++) {
+                var dir = mapTest.GetRoad(x, 0, Direction.UP);
+                Assert.Null(dir);
+            }
+        }
+        [Fact]
+        public void InitializeMap_CheckIfLeftEdgeRoadsHaveNulls() {
+            var mapTest = new Map();
+            for (int y = 0; y < 5; y++) {
+                var dir = mapTest.GetRoad(0, y, Direction.LEFT);
+                Assert.Null(dir);
+            }
+        }
+        [Fact]
+        public void InitializeMap_CheckIfRightEdgeRoadsHaveNulls() {
+            var mapTest = new Map();
+            for (int y = 0; y < 5; y++) {
+                var dir = mapTest.GetRoad(4, y, Direction.RIGHT);
+                Assert.Null(dir);
+            }
+        }
+        [Fact]
+        public void InitializeMap_CheckIfBottomEdgeRoadsHaveNulls() {
+            var mapTest = new Map();
+            for (int x = 0; x < 5; x++) {
+                var dir = mapTest.GetRoad(x, 4, Direction.DOWN);
+                Assert.Null(dir);
+            }
+        }
+
+        [Fact]
+        public void InitializeMap_CheckDownValidRoads() {
+            var mapTest = new Map();
+            for (int y = 0; y < 4;y++) {
+                for (int x = 0;x < 5;x++) {
+                    Roads cell = mapTest.GetRoads(x, y);
+                    Assert.NotNull(cell.Down);
+                }
+            }
+        }
+        [Fact]
+        public void InitializeMap_CheckLeftValidRoads() {
+            var mapTest = new Map();
+            for (int y = 0; y < 5; y++) {
+                for (int x = 1; x < 5; x++) {
+                    Roads cell = mapTest.GetRoads(x, y);
+                    Assert.NotNull(cell.Left);
+                }
+            }
+        }
+        [Fact]
+        public void InitializeMap_CheckRightValidRoads() {
+            var mapTest = new Map();
+            for (int y = 0; y < 5; y++) {
+                for (int x = 0; x < 4; x++) {
+                    Roads cell = mapTest.GetRoads(x, y);
+                    Assert.NotNull(cell.Right);
+                }
+            }
+        }
+        [Fact]
+        public void InitializeMap_CheckUpValidRoads() {
+            var mapTest = new Map();
+            for (int y = 1; y < 5; y++) {
+                for (int x = 0; x < 5; x++) {
+                    Roads cell = mapTest.GetRoads(x, y);
+                    Assert.NotNull(cell.Up);
+                }
+            }
+        }
+
+
+
     }
 }
