@@ -7,5 +7,6 @@ public enum PlanetKind
     COBALT,
     OXYGEN,
     FOOD,
-    WATER
+    WATER,
+    OUTPOST
 }
