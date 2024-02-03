@@ -1,4 +1,6 @@
-﻿namespace SpaceCatan.GameLogic;
+﻿using System.Collections.Specialized;
+
+namespace SpaceCatan.GameLogic;
 
 public sealed class Game
 {
@@ -26,16 +28,50 @@ public sealed class Game
 		}
 		Player p = Players[playerID - 1];
 
-		// TODO: count resources after trading
+		Dictionary<Resource, int> resources = new() {
+			[Resource.GRAVITRONIUM] = p.Gravitronium,
+			[Resource.COBALT] = p.Cobalt,
+			[Resource.OXYGEN] = p.Oxygen,
+			[Resource.FOOD] = p.Food,
+			[Resource.WATER] = p.Water
+		};
 
-		// TODO: count resources for roads
-		// TODO: count resources for colonies
+		foreach (var (resource, count) in turn.ResourcesTraded)
+		{
+			resources[resource] += count;
+		}
 
-		// TODO: add/subtract resources
+		// Roads
+		resources[Resource.GRAVITRONIUM] -= 1 * turn.Roads.Length;
+		resources[Resource.COBALT] -= 1 * turn.Roads.Length;
 
-		// TODO: build roads and colonies
+		// Colonies
+		resources[Resource.GRAVITRONIUM] -= 1 * turn.Colonies.Length;
+		resources[Resource.OXYGEN] -= 1 * turn.Colonies.Length;
+		resources[Resource.FOOD] -= 1 * turn.Colonies.Length;
+
+		// Update resource counds
+		p.Gravitronium += resources[Resource.GRAVITRONIUM];
+		p.Cobalt += resources[Resource.COBALT];
+		p.Oxygen += resources[Resource.OXYGEN];
+		p.Water += resources[Resource.WATER];
+		p.Food += resources[Resource.FOOD];
+
+		// Build roads
+		foreach (RoadToBuild r in turn.Roads)
+		{
+			Map.SetRoad(r.X, r.Y, r.Direction, playerID);
+		}
+
+		// Build colonies
+		foreach (ColonyToBuild c in turn.Colonies)
+		{
+			Map.SetPlanetOwner(c.X, c.Y, playerID);
+		}
+
 		// TODO: apply development cards
 
+		Players[playerID - 1] = p;
 		turnIndex++;
 	}
 }
