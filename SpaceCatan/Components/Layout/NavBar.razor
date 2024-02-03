@@ -1,0 +1,28 @@
+﻿<nav class="navbar is-fixed-top is-dark">
+	<div class="navbar-brand">
+		<a class="navbar-item" href="/">
+			LOGO
+		</a>
+	</div>
+	<div id="navbar" class="navbar-menu has-background-grey-darker">
+		<div class="navbar-start">
+		</div>
+		<div class="navbar-end">
+			<AuthorizeView>
+				<Authorized>
+					<div class="navbar-item">
+						<a class="has-text-light" href="/profile">@context.User.Identity?.Name</a>
+					</div>
+					<div class="navbar-item">
+						<a class="button is-danger" href="/logout?redirectTo=/">Logout</a>
+					</div>
+				</Authorized>
+				<NotAuthorized>
+					<div class="navbar-item">
+						<a class="button" href="/login?redirectUri=/">Login</a>
+					</div>
+				</NotAuthorized>
+			</AuthorizeView>
+		</div>
+	</div>
+</nav>
