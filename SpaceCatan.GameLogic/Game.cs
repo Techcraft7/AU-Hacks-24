@@ -1,6 +1,4 @@
-﻿using System.Collections.Specialized;
-
-namespace SpaceCatan.GameLogic;
+﻿namespace SpaceCatan.GameLogic;
 
 public sealed class Game
 {
