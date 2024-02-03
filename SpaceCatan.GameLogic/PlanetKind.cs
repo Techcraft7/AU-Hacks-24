@@ -3,7 +3,7 @@
 public enum PlanetKind
 {
     UNKNOWN = 0,
-    EMPTY
+    EMPTY,
     GRAVITRONIUM,
     COBALT,
     OXYGEN,
