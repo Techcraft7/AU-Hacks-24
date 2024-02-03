@@ -2,7 +2,7 @@
 
 namespace SpaceCatan.Data;
 
-public class SpaceCatanContext : DbContext
+public class SpaceCatanContext(DbContextOptions options) : DbContext(options)
 {
 	public DbSet<User> Users { get; set; }
 }
