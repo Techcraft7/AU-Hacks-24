@@ -14,6 +14,8 @@ builder.Services.AddAuth0WebAppAuthentication(o =>
 
 var app = builder.Build();
 
+app.UseStaticFiles();
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseAntiforgery();
