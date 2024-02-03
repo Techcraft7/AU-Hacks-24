@@ -1,4 +1,6 @@
-﻿namespace SpaceCatan.GameLogic;
+﻿using System.Collections;
+
+namespace SpaceCatan.GameLogic;
 
 public sealed class Map
 {
@@ -7,9 +9,37 @@ public sealed class Map
 
     public Map()
     {
-        // TODO: fill planets array (place outposts on edge)s
         // TODO: init roads to 0
         // TODO: set out of bounds roads to null
+        var rand = new Random();
+        // center of each edge is guaranteed outpost
+        planets[0, 2] = new Planet(PlanetKind.OUTPOST, 0);
+        planets[2, 0] = new Planet(PlanetKind.OUTPOST, 0);
+        planets[2, 4] = new Planet(PlanetKind.OUTPOST, 0);
+        planets[4, 2] = new Planet(PlanetKind.OUTPOST, 0);
+        // 4 of each resource, 1 empty
+        var poolOfResources = new List<PlanetKind>() {
+            PlanetKind.FOOD,PlanetKind.FOOD,PlanetKind.FOOD,PlanetKind.FOOD,
+            PlanetKind.WATER,PlanetKind.WATER,PlanetKind.WATER,PlanetKind.WATER,
+            PlanetKind.OXYGEN,PlanetKind.OXYGEN,PlanetKind.OXYGEN,PlanetKind.OXYGEN,
+            PlanetKind.COBALT,PlanetKind.COBALT,PlanetKind.COBALT,PlanetKind.COBALT,
+            PlanetKind.GRAVITRONIUM,PlanetKind.GRAVITRONIUM,PlanetKind.GRAVITRONIUM,PlanetKind.GRAVITRONIUM,
+            PlanetKind.EMPTY
+        };
+        
+        for (int y = 0; y < 5; y++)
+        {
+            for (int x = 0; x < 5; x++)
+            {
+                if (GetPlanet(x, y).Kind != PlanetKind.OUTPOST)
+                {
+                    int next = rand.Next(poolOfResources.Count);
+                    planets[x, y] = new Planet(poolOfResources.ElementAt(next), 0);
+                    poolOfResources.RemoveAt(next);
+                }
+            }   
+        }
+
     }
 
     public Planet GetPlanet(int x, int y)
