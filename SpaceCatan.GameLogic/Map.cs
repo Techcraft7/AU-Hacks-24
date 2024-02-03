@@ -15,11 +15,26 @@ public sealed class Map
         planets[4, 2] = new Planet(PlanetKind.OUTPOST, 0, 0);
         // 4 of each resource, 1 empty
         Span<(PlanetKind, int)> pool = [
-            (PlanetKind.FOOD, 1), (PlanetKind.FOOD, 2) , (PlanetKind.FOOD, 3 ), (PlanetKind.FOOD, 4),
-            (PlanetKind.WATER, 1), (PlanetKind.WATER, 2) , (PlanetKind.WATER, 3 ), (PlanetKind.WATER, 4),
-            (PlanetKind.OXYGEN, 1), (PlanetKind.OXYGEN, 2) , (PlanetKind.OXYGEN, 3 ), (PlanetKind.OXYGEN, 4),
-            (PlanetKind.COBALT, 1), (PlanetKind.COBALT, 2) , (PlanetKind.COBALT, 3 ), (PlanetKind.COBALT, 4),
-            (PlanetKind.GRAVITRONIUM, 1), (PlanetKind.GRAVITRONIUM, 2) , (PlanetKind.GRAVITRONIUM, 3 ), (PlanetKind.GRAVITRONIUM, 4),
+            (PlanetKind.FOOD, 1),
+            (PlanetKind.FOOD, 2),
+            (PlanetKind.FOOD, 3),
+            (PlanetKind.FOOD, 4),
+            (PlanetKind.WATER, 1),
+            (PlanetKind.WATER, 2),
+            (PlanetKind.WATER, 3),
+            (PlanetKind.WATER, 4),
+            (PlanetKind.OXYGEN, 1),
+            (PlanetKind.OXYGEN, 2),
+            (PlanetKind.OXYGEN, 3),
+            (PlanetKind.OXYGEN, 4),
+            (PlanetKind.COBALT, 1),
+            (PlanetKind.COBALT, 2),
+            (PlanetKind.COBALT, 3),
+            (PlanetKind.COBALT, 4),
+            (PlanetKind.GRAVITRONIUM, 1),
+            (PlanetKind.GRAVITRONIUM, 2),
+            (PlanetKind.GRAVITRONIUM, 3),
+            (PlanetKind.GRAVITRONIUM, 4),
             (PlanetKind.EMPTY, 0)
         ];
         
