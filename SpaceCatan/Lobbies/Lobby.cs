@@ -17,6 +17,10 @@ public sealed class Lobby
 		{
 			return false;
 		}
+		if (PlayerIDMap.ContainsKey(user.ID))
+		{
+			return false;
+		}
 		await semaphore.WaitAsync();
 		PlayerIDMap.Add(user.ID, 0);
 		log.Add($"Waiting: {PlayerIDMap.Count}/4");

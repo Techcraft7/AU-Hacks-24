@@ -88,17 +88,21 @@
 				NavManager.NavigateTo("/play");
 				return;
 			}
+			Lobby = l;
 		}
+
+#if DEBUG
+	Logger.LogInformation($"Put user {user.ID} in lobby {Lobby.ID}");
+#endif
 
 		Lobby.LobbyUpdated += LobbyUpdate;
 		StateHasChanged();
 	}
 
-	private Task LobbyUpdate(Lobby l)
+	private async Task LobbyUpdate(Lobby l)
 	{
 		Lobby = l;
-		StateHasChanged();
-		return Task.CompletedTask;
+		await InvokeAsync(() => StateHasChanged());
 	}
 
 	public void Dispose() => Lobby.LobbyUpdated -= LobbyUpdate;
