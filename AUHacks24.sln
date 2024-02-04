@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpaceCatan.GameLogic", "Spa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpaceCatan.GameLogic.Tests", "SpaceCatan.GameLogic.Tests\SpaceCatan.GameLogic.Tests.csproj", "{121D8B15-F3C1-457B-BF76-D6F46DFA0791}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceCatan.Data", "SpaceCatan.Data\SpaceCatan.Data.csproj", "{9E712A7E-F688-4592-A12B-62D40F9CF7F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpaceCatan.Data", "SpaceCatan.Data\SpaceCatan.Data.csproj", "{9E712A7E-F688-4592-A12B-62D40F9CF7F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

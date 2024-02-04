@@ -1,4 +1,6 @@
-﻿<div class="container">
+﻿<Exchanger Rate="Lobby.Game.Map.HasOutpost(PlayerID) ? 2 : 4" @ref="exchanger" OnClose="Update" />
+
+<div class="container">
 	<div class="actions">
         @if (!Lobby.Game.IsInSetup)
         {
@@ -11,7 +13,7 @@
             </label>
             <hr />
         }
-        @if (Lobby.Game.IsInSetup)
+        @if (Lobby.Game.IsInSetup && false)
         {
             <div class="has-text-centered mb-3">
                 <p class="title is-4 has-text-light">Setup Phase</p>
@@ -37,7 +39,7 @@
                 {
                     if (v != 0)
                     {
-                        <li>@v @(FormatName(k.ToString()))</li>
+                        <li>@(v > 0 ? "+" : "")@v @(FormatName(k.ToString()))</li>
                     }
                 }
             </ul>
@@ -45,7 +47,7 @@
         @if (!Lobby.Game.IsInSetup || true)
         {
             <hr />
-            <button class="button is-link is-fullwidth" @onclick="() => {}">Exchange</button>            
+            <button class="button is-link is-fullwidth" @onclick="OpenExchanger">Exchange</button>            
         }
     </div>
 	<button class="button is-success" disabled="@(!IsValidTurn)" @onclick="OnEndTurn">End Turn</button>
@@ -80,6 +82,7 @@
     private NumberPicker Picker { get; set; } = null!;
     private Dictionary<Resource, int> resourceDeltas = [];
     private List<RoadToBuild> roadsToBuild = [];
+    private Exchanger exchanger = null!;
     private bool UseDevCard
     {
         get => useDevCard;
@@ -90,6 +93,13 @@
         }
     }
     private bool useDevCard = false;
+
+    private void OpenExchanger()
+    {
+        exchanger.Show = true;
+        exchanger.Update();
+        StateHasChanged();
+    }
 
     protected override void OnParametersSet()
     {
@@ -132,6 +142,8 @@
             [Resource.WATER] = 0,
         };
 
+        PopulateResourceDictWithExchanges(resourceDeltas);
+
         resourceDeltas[Resource.COBALT] -= DevelopmentCardsToBuy;
         resourceDeltas[Resource.FOOD] -= DevelopmentCardsToBuy;
         resourceDeltas[Resource.WATER] -= DevelopmentCardsToBuy;
@@ -172,13 +184,34 @@
             return;
         }
 
-        await Lobby.PlayTurn(User, new(roadsToBuild.ToArray(), ColoniesToBuild.ToArray(), [], DevelopmentCardsToBuy, useDevCard));
+        Dictionary<Resource, int> exhcanges = new()
+        {
+            [Resource.GRAVITRONIUM] = 0,
+            [Resource.COBALT] = 0,
+            [Resource.OXYGEN] = 0,
+            [Resource.FOOD] = 0,
+            [Resource.WATER] = 0,
+        };
+
+        PopulateResourceDictWithExchanges(exhcanges);
+
+        await Lobby.PlayTurn(User, new(roadsToBuild.ToArray(), ColoniesToBuild.ToArray(), exhcanges, DevelopmentCardsToBuy, useDevCard));
     }
 
     public void Update()
     {
         OnParametersSet();
         _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void PopulateResourceDictWithExchanges(Dictionary<Resource, int> d)
+    {
+        int exchangeRate = Lobby.Game.Map.HasOutpost(PlayerID) ? 2 : 4;
+        foreach (var step in exchanger.Steps)
+        {
+            d[step.Input] -= exchangeRate;
+            d[step.Output] += 1;
+        }
     }
 
     private static string FormatName(ReadOnlySpan<char> chars)

@@ -51,7 +51,7 @@
 		_ => 0
 	};
 
-	private string GetResourceImage(Resource r) => r switch
+	public static string GetResourceImage(Resource r) => r switch
 	{
 		Resource.GRAVITRONIUM => "/img/Gravitronium.png",
 		Resource.COBALT => "/img/Cobalt.png",
