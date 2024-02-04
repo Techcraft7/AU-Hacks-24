@@ -10,7 +10,13 @@
 <section class="section">
 	<div class="columns">
 		<div class="column box has-background-dark has-text-light">
-			@if (Lobby.HasStarted)
+			@if (Lobby.Winner is int w)
+			{
+				<div class="has-text-centered">
+					<p>Player @w wins!</p>
+				</div>
+			}
+			else if (Lobby.HasStarted)
 			{
 				<div class="has-text-centered">
 					<p style="color: @Board.GetPlayerColor(PlayerID)">You are: Player @PlayerID</p>
@@ -25,13 +31,17 @@
 			}
 		</div>
 		<div class="column is-three-fifths p-0">
-			<Board Game="@Lobby.Game" PlayerID="@PlayerID" @ref="@board" UpdatedCallback="() => actions.Update()" />
+			<Board Game="@Lobby.Game" PlayerID="@PlayerID" @ref="@board" UpdatedCallback="() => actions?.Update()" />
 		</div>
 		<div class="column split">
 			<div class="log box has-background-dark has-text-light">
 				@if (Lobby.HasStarted)
 				{
-					if (Lobby.HasStarted && Lobby.Game.CurrentPlayer == PlayerID)
+					if (Lobby.Winner is not null)
+					{
+						<p>Game is over!</p>
+					}
+					else if (Lobby.HasStarted && Lobby.Game.CurrentPlayer == PlayerID)
 					{
 						<Actions @ref="@actions" PlayerID="@PlayerID" User="@User" Lobby="@Lobby" RoadsToBuildRaw="@board?.RoadsToBuild" ColoniesToBuild="@board?.ColoniesToBuild" />
 					}
@@ -164,10 +174,16 @@
 	private async Task LobbyUpdate(Lobby l)
 	{
 		Lobby = l;
-		await InvokeAsync(() =>
+		await InvokeAsync(async () =>
 		{
+			board?.ClearSelection();
+			if (Lobby.Winner is not null)
+			{
+				User.Wins += Lobby.Winner == Lobby.PlayerIDMap.GetValueOrDefault(User.ID) ? 1 : 0;
+				User.CurrentLobby = null;
+				await UserStore.UpdateUser(User, default);
+			}
 			StateHasChanged();
-			board.ClearSelection();
 		});
 	}
 

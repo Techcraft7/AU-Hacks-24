@@ -248,7 +248,7 @@ public sealed class Game
 				Planet p = Map.GetPlanet(x, y);
 				if (p.Owner is >= 1 and <= 4)
 				{
-					counts[p.Owner] += 1;
+					counts[p.Owner - 1] += 1;
 				}
 			}
 		}

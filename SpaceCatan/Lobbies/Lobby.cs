@@ -5,6 +5,7 @@ public sealed class Lobby
 	public Guid ID { get; set; }
 	public Dictionary<string, int> PlayerIDMap { get; set; } = [];
 	public bool HasStarted { get; private set; }
+	public int? Winner { get; private set; }
 	public Game Game { get; private set; } = new();
 	public IReadOnlyList<string> Log => log;
 	public event Func<Lobby, Task>? LobbyUpdated;
@@ -86,6 +87,12 @@ public sealed class Lobby
 					DevelopmentCardKind.CLIMATE_CHANGE => "A planet has changed resources!",
 					_ => "A Chaos Card was played!"
 				});
+			}
+
+			if (Game.GetWinner() is int winner)
+			{
+				log.Add($"Player {winner} wins!");
+				Winner = winner;
 			}
 		}
 		semaphore.Release();
