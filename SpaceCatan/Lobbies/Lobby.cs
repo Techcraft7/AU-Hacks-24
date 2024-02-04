@@ -70,7 +70,22 @@ public sealed class Lobby
 		await semaphore.WaitAsync();
 		if (!Game.IsInSetup)
 		{
+			int current = Game.CurrentPlayer;
 			Game.MakeTurn(playerID, turn);
+			if (Game.DevelopmentCardData is DevelopmentCardPlayedData data)
+			{
+				log.Add(data.Kind switch
+				{
+					DevelopmentCardKind.HEIST => "A hiest occured!",
+					DevelopmentCardKind.NUKE => "Somebody's Colony has been nuked!",
+					DevelopmentCardKind.DROUGHT => "A drought occured! Everybody loses 1 resource!",
+					DevelopmentCardKind.OVERTIME => $"Player {current} takes another turn!",
+					DevelopmentCardKind.INDUSTRIALIZATION => "A planet has been over-harvested!",
+					DevelopmentCardKind.CLIMATE_CHANGE => "A planet has changed resources!",
+					_ => "A Chaos Card was played!"
+				});
+			}
+
             log.Add($"Picking resource #{Game.GiveResources()}");
         }
 		semaphore.Release();

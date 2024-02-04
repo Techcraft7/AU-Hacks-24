@@ -60,7 +60,7 @@
 				}
 			</div>
 			<div class="bottom box has-background-dark has-text-light">
-				@foreach (string str in Lobby.Log)
+				@foreach (string str in Lobby.Log.Reverse())
 				{
 					<p>@str</p>
 				}
@@ -164,7 +164,11 @@
 	private async Task LobbyUpdate(Lobby l)
 	{
 		Lobby = l;
-		await InvokeAsync(() => StateHasChanged());
+		await InvokeAsync(() =>
+		{
+			StateHasChanged();
+			board.ClearSelection();
+		});
 	}
 
 	public void Dispose() => Lobby.LobbyUpdated -= LobbyUpdate;

@@ -99,11 +99,11 @@ public sealed class Game
 		resources[Resource.WATER] -= 1 * turn.DevelopmentCardsBought;
 
 		// Update resource counts
-		p.Gravitronium += resources[Resource.GRAVITRONIUM];
-		p.Cobalt += resources[Resource.COBALT];
-		p.Oxygen += resources[Resource.OXYGEN];
-		p.Water += resources[Resource.WATER];
-		p.Food += resources[Resource.FOOD];
+		p.Gravitronium = resources[Resource.GRAVITRONIUM];
+		p.Cobalt = resources[Resource.COBALT];
+		p.Oxygen = resources[Resource.OXYGEN];
+		p.Water = resources[Resource.WATER];
+		p.Food = resources[Resource.FOOD];
 		p.DevelopmentCards += turn.DevelopmentCardsBought;
 
 		// Build roads
