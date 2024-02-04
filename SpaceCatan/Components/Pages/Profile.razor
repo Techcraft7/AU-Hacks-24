@@ -1,0 +1,56 @@
+﻿@page "/profile"
+@attribute [Authorize]
+@inject IUserStore UserStore
+@inject NavigationManager NavManager
+@inject ILogger<Profile> Logger
+
+<section class="section">
+	<div class="container">
+		<div class="columns">
+			<div class="column is-hidden-mobile"></div>
+			<div class="column is-two-thirds">
+				<div class="has-text-centered mb-5">
+					<p class="title is-1 has-text-light">
+						@Username
+					</p>
+				</div>
+				<div class="has-text-centered">
+					<p>
+						@User.Wins wins
+					</p>
+				</div>
+			</div>
+			<div class="column"></div>
+		</div>
+	</div>
+</section>
+
+@code {
+	[CascadingParameter]
+	public Task<AuthenticationState> AuthenticationStateTask { get; set; } = null!;
+	private User User { get; set; } = null!;
+	private string Username { get; set; } = string.Empty;
+
+	protected override async Task OnInitializedAsync()
+	{
+		var state = await AuthenticationStateTask;
+		string userID = state.User.FindFirst("id")?.Value ?? string.Empty;
+
+		var (user, error) = await UserStore.GetUser(userID, default);
+		if (error is not null)
+		{
+			Logger.LogError(error, "Failed to get user");
+			NavManager.NavigateTo("/");
+			return;
+		}
+
+		if (user is null)
+		{
+			NavManager.NavigateTo("/");
+			return;
+		}
+
+		User = user;
+		Username = state.User.Identity?.Name!;
+	}
+}
