@@ -11,7 +11,7 @@ public sealed class Map
     {
         var rand = new Random();
         // center of each edge is guaranteed outpost
-        planets[0, 2] = new Planet(PlanetKind.OUTPOST, 0, 0);
+        planets[0, 2] = new Planet(PlanetKind.OUTPOST, 0, 1);
         planets[2, 0] = new Planet(PlanetKind.OUTPOST, 0, 0);
         planets[2, 4] = new Planet(PlanetKind.OUTPOST, 0, 0);
         planets[4, 2] = new Planet(PlanetKind.OUTPOST, 0, 0);
@@ -79,7 +79,7 @@ public sealed class Map
                 }
             }
         }
-
+        SetRoad(0, 2, Direction.RIGHT, 1);
     }
 
     public Planet GetPlanet(int x, int y)

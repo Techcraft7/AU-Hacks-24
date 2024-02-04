@@ -4,7 +4,7 @@
 		<NumberPicker @ref="@Picker" Updated="Update" />
 		<p class="help">1 Chaos Card = 1 Cobalt + 1 Food + 1 Water</p>
 		<label class="checkbox has-text-light mt-3">
-            <input type="checkbox" @bind-value="@useDevCard" />
+            <input type="checkbox" @bind-value="@UseDevCard" />
             Use a Chaos Card?
         </label>
         <hr />
@@ -43,6 +43,15 @@
     private NumberPicker Picker { get; set; } = null!;
     private Dictionary<Resource, int> cost = [];
     private List<RoadToBuild> roadsToBuild = [];
+    private bool UseDevCard
+    {
+        get => useDevCard;
+        set
+        {
+            useDevCard = value;
+            Update();
+        }
+    }
     private bool useDevCard = false;
 
     protected override void OnParametersSet()
