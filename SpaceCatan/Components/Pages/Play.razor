@@ -23,7 +23,7 @@
 			}
 		</div>
 		<div class="column is-three-fifths p-0">
-			<Board Game="@Lobby.Game" @ref="@board" UpdatedCallback="() => actions.Update()" />
+			<Board Game="@Lobby.Game" PlayerID="@PlayerID" @ref="@board" UpdatedCallback="() => actions.Update()" />
 		</div>
 		<div class="column split">
 			<div class="log box has-background-dark has-text-light">
