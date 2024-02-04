@@ -1,0 +1,44 @@
+﻿@page "/play"
+@attribute [Authorize]
+@inject IUserStore UserStore
+@inject ILogger<Play> Logger
+@inject NavigationManager NavManager
+@rendermode InteractiveServer
+
+<div class="board">
+	@for (int y = 0; y < 5; y++)
+	{
+		@for (int x = 0; x < 5; x++)
+		{
+			<div class="cell">
+				TODO
+			</div>
+		}
+	}
+</div>
+
+@code {
+	[CascadingParameter]
+	public Task<AuthenticationState> AuthenticationStateTask { get; set; } = null!;
+	private Lobby Lobby { get; set; } = null!;
+
+	protected override async Task OnInitializedAsync()
+	{
+		var auth = await AuthenticationStateTask;
+		string userID = auth.User.FindFirst("id")?.Value ?? string.Empty;
+
+		var (user, error) = await UserStore.GetUser(userID, default);
+		if (error is not null)
+		{
+			Logger.LogError(error, "Failed to get user data");
+			NavManager.NavigateTo("/");
+			return;
+		}
+
+		if (user?.CurrentLobby is null)
+		{
+			NavManager.NavigateTo("/");
+			return;
+		}
+	}
+}
