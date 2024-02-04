@@ -207,7 +207,7 @@
     private void PopulateResourceDictWithExchanges(Dictionary<Resource, int> d)
     {
         int exchangeRate = Lobby.Game.Map.HasOutpost(PlayerID) ? 2 : 4;
-        foreach (var step in exchanger.Steps)
+        foreach (var step in exchanger?.Steps ?? Array.Empty<Exchanger.Step>())
         {
             d[step.Input] -= exchangeRate;
             d[step.Output] += 1;
