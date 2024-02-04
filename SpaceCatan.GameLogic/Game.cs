@@ -164,10 +164,6 @@ public sealed class Game
 						}
 					}
 					Map.SetPlanetOwner(x, y, 0);
-					Map.SetRoad(x, y, Direction.UP, 0);
-					Map.SetRoad(x, y, Direction.DOWN, 0);
-					Map.SetRoad(x, y, Direction.LEFT, 0);
-					Map.SetRoad(x, y, Direction.RIGHT, 0);
 					DevelopmentCardData = new(DevelopmentCardKind.NUKE, x, y, 0);
 					break;
 				case 2: // Everybody loses 1 of a random resource (Drought)
@@ -205,7 +201,9 @@ public sealed class Game
 					DevelopmentCardData = new(DevelopmentCardKind.INDUSTRIALIZATION, x, y, 0);
 					break;
 				case 5: // A random planet becomes a different resource (Climate Change)
-					while (true)
+					maxTries = 9999;
+					x = y = 0;
+					while (maxTries-- > 0)
 					{
 						x = Random.Shared.Next(5);
 						y = Random.Shared.Next(5);

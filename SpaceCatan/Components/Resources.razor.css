@@ -6,7 +6,8 @@
 }
 
 .list img {
-	max-height: 10vh;
+	max-height: calc(11vh - 10px);
+	margin: 5px;
 }
 
 .list p {
