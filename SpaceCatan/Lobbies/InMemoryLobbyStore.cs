@@ -30,6 +30,12 @@ public sealed class InMemoryLobbyStore : ILobbyStore
 
 		await semaphore.WaitAsync(cancellationToken);
 		lobbies.Add(lobby.ID, lobby);
+		lobby.OnGameEnd += async (l) =>
+		{
+			await semaphore.WaitAsync();
+			lobbies.Remove(l.ID);
+			semaphore.Release();
+		};
 		semaphore.Release();
 
 		return (lobby, null);

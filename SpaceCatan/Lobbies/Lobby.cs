@@ -12,6 +12,7 @@ public sealed class Lobby
 	private readonly SemaphoreSlim semaphore = new(1);
 	private readonly List<string> log = [];
 	private readonly Dictionary<string, bool> LeftPlayers = [];
+	public event Func<Lobby, Task>? OnGameEnd;
 
 	public async Task<bool> TryAddPlayer(User user)
 	{
@@ -138,6 +139,7 @@ public sealed class Lobby
 			{
 				log.Add($"Player {winner} wins!");
 				Winner = winner;
+				await (OnGameEnd?.Invoke(this) ?? Task.CompletedTask);
 			}
 		}
 		semaphore.Release();
@@ -156,6 +158,7 @@ public sealed class Lobby
 		if (HasStarted && LeftPlayers.Values.All(x => x))
 		{
 			Winner = 0;
+			await (OnGameEnd?.Invoke(this) ?? Task.CompletedTask);
 		}
 	}
 
