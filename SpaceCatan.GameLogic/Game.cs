@@ -86,7 +86,22 @@ public sealed class Game
 			switch (Random.Shared.Next(6))
 			{
 				case 0: // Steal 2 resources (Heist)
-					// TODO
+					int robbedPlayer;
+					while (true)
+					{
+						robbedPlayer = Random.Shared.Next(4);
+						if (robbedPlayer + 1 != playerID)
+						{
+							break;
+						}
+					}
+					for (int i = 0; i < 2; i++)
+					{
+						if (TakeResource(robbedPlayer, null, 1) is Resource r)
+						{
+							AddResource(playerID, r, 1);
+						}
+					}
 					DevelopmentCardData = new(DevelopmentCardKind.HEIST, 0, 0, 0);
 					break;
 				case 1: // Nuke a colony (Nuke)
@@ -109,8 +124,19 @@ public sealed class Game
 					DevelopmentCardData = new(DevelopmentCardKind.NUKE, x, y, 0);
 					break;
 				case 2: // Everybody loses 1 of a random resource (Drought)
-					// TODO
-					DevelopmentCardData = new(DevelopmentCardKind.HEIST, 0, 0, 0);
+					Resource droughtResource = Random.Shared.Next(5) switch
+					{
+						0 => Resource.GRAVITRONIUM,
+						1 => Resource.COBALT,
+						2 => Resource.OXYGEN,
+						3 => Resource.FOOD,
+						_ => Resource.WATER,
+					};
+					for (int i = 0; i < 4; i++)
+					{
+						_ = TakeResource(i + 1, droughtResource, 1);
+					}
+					DevelopmentCardData = new(DevelopmentCardKind.HEIST, 0, 0, droughtResource);
 					break;
 				case 3: // Make it your turn again (Overtime)
 					turnIndex--;
@@ -188,5 +214,89 @@ public sealed class Game
 			}
 		}
 		return null;
+	}
+
+	private Resource? TakeResource(int playerID, Resource? resource, int count)
+	{
+		if (playerID is < 1 or > 4)
+		{
+			return null;
+		}
+		Player p = Players[playerID - 1];
+		
+		// Pick a random resource that they do have
+		if (resource is null)
+		{
+			Span<int> counts = [p.Gravitronium, p.Cobalt, p.Oxygen, p.Food, p.Water];
+			Span<Resource> kinds = [Resource.GRAVITRONIUM, Resource.COBALT, Resource.OXYGEN, Resource.FOOD, Resource.WATER];
+
+			// If they have no resources then bail
+			// (the while loop below would go forever)
+			if (!counts.ContainsAnyExcept(0))
+			{
+				return null;
+			}
+
+			int i;
+			while (true)
+			{
+				i = Random.Shared.Next(counts.Length);
+				if (counts[i] != 0)
+				{
+					break;
+				}
+			}
+			TakeResource(playerID, kinds[i], count);
+		}
+
+
+		switch (resource)
+		{
+			case Resource.GRAVITRONIUM:
+				p.Gravitronium -= count;
+				break;
+			case Resource.COBALT:
+				p.Cobalt -= count;
+				break;
+			case Resource.OXYGEN:
+				p.Oxygen -= count;
+				break;
+			case Resource.FOOD:
+				p.Food -= count;
+				break;
+			case Resource.WATER:
+				p.Water -= count;
+				break;
+		}
+		Players[playerID - 1] = p;
+		return resource;
+	}
+
+	private void AddResource(int playerID, Resource resource, int count)
+	{
+		if (playerID is < 1 or > 4)
+		{
+			return;
+		}
+		Player p = Players[playerID - 1];
+		switch (resource)
+		{
+			case Resource.GRAVITRONIUM:
+				p.Gravitronium += count;
+				break;
+			case Resource.COBALT:
+				p.Cobalt += count;
+				break;
+			case Resource.OXYGEN:
+				p.Oxygen += count;
+				break;
+			case Resource.FOOD:
+				p.Food += count;
+				break;
+			case Resource.WATER:
+				p.Water += count;
+				break;
+		}
+		Players[playerID - 1] = p;
 	}
 }
