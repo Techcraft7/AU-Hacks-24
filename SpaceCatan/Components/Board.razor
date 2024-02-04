@@ -3,11 +3,11 @@
 	{
 		@for (int x = 0; x < 5; x++)
 		{
-			Planet p = Map.GetPlanet(x, y);
+			Planet p = Game.Map.GetPlanet(x, y);
 			<div class="cell">
 				<svg viewBox="0 0 256 256" width="100%">
 					@{
-						var roads = Map.GetRoads(x, y);
+						var roads = Game.Map.GetRoads(x, y);
 						int xCopy = x;
 						int yCopy = y;
 					}
@@ -59,7 +59,7 @@
 
 @code {
 	[Parameter]
-	public Map Map { get; set; } = null!;
+	public Game Game { get; set; } = null!;
 	public IReadOnlyList<RoadToBuild> RoadsToBuild => roadsToBuild;
 	private List<RoadToBuild> roadsToBuild = [];
 
