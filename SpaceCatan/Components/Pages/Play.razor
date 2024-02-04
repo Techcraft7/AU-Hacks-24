@@ -54,6 +54,10 @@
 	</div>
 </section>
 
+<HeadContent>
+	<script src="_framework/blazor.web.js"></script>
+</HeadContent>
+
 @code {
 	[CascadingParameter]
 	public Task<AuthenticationState> AuthenticationStateTask { get; set; } = null!;
