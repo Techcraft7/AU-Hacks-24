@@ -28,6 +28,15 @@ public sealed class Lobby
 		{
 			log.Add($"Game Started!");
 			HasStarted = true;
+			int[] ids = [1, 2, 3, 4];
+			int i = 4;
+			foreach (string k in PlayerIDMap.Keys)
+			{
+				int j = Random.Shared.Next(i);
+				PlayerIDMap[k] = ids[j];
+				ids[j] = ids[i];
+				i--;
+			}
 		}
 		semaphore.Release();
 		await Update();
