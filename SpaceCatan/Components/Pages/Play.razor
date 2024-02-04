@@ -5,17 +5,33 @@
 @inject NavigationManager NavManager
 @rendermode InteractiveServer
 
-<div class="board">
-	@for (int y = 0; y < 5; y++)
-	{
-		@for (int x = 0; x < 5; x++)
-		{
-			<div class="cell">
-				TODO
+<section class="section">
+	<div class="columns">
+		<div class="column"></div>
+		<div class="column is-three-fifths p-0">
+			<div class="board">
+				@for (int y = 0; y < 5; y++)
+				{
+					@for (int x = 0; x < 5; x++)
+					{
+						<div class="cell">
+							TODO: planet<br />TODO: roads
+						</div>
+					}
+				}
 			</div>
-		}
-	}
-</div>
+		</div>
+		<div class="column split">
+			<div class="log">actions</div>
+			<div class="bottom">
+				@for (int i = 0; i < 50; i++)
+				{
+					<p>TODO: log</p>
+				}
+			</div>
+		</div>
+	</div>
+</section>
 
 @code {
 	[CascadingParameter]
@@ -26,6 +42,8 @@
 	{
 		var auth = await AuthenticationStateTask;
 		string userID = auth.User.FindFirst("id")?.Value ?? string.Empty;
+
+		return;
 
 		var (user, error) = await UserStore.GetUser(userID, default);
 		if (error is not null)
