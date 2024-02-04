@@ -119,6 +119,7 @@
 			roadsToBuild.Remove(r);
 			roadsToBuild.Remove(r.Opposite());
 			coloniesToBuild.RemoveAll(c => !Game.Map.CanBuildColonyAt(c.X, c.Y, Game.CurrentPlayer, roadsToBuild));
+			Game.Map.RemoveDisjointRoads(Game.CurrentPlayer, roadsToBuild);
 		}
 		else if (!onlyRemove)
 		{
