@@ -23,32 +23,20 @@ public static class CanBuildMapExtensions
 			return false;
 		}
 
-		Span<Direction> allDirs = [ Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT ];
+		if (map.GetRoad(x, y, dir) != 0)
+		{
+			return false;
+		}
+
+		Span<Direction> allDirs = [Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT];
 		foreach (Direction i in allDirs)
 		{
-			if (i == dir)
-			{
-				continue;
-			}
 			if (map.GetRoad(x, y, i) == player)
 			{
 				return true;
 			}
-
-			(int dx, int dy) = i switch
-			{
-				Direction.UP => (0, -1),
-				Direction.DOWN => (0, 1),
-				Direction.LEFT => (-1, 0),
-				Direction.RIGHT => (1, 0),
-				_ => (0, 0)
-			};
-
-			if (map.GetPlanet(x + dx, y + dy).Owner == player)
-			{
-				return true;
-			}
 		}
-		return false;
+
+		return map.GetPlanet(x, y).Owner == player;
 	}
 }
