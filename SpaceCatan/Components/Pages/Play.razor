@@ -16,9 +16,9 @@
 		<div class="column split">
 			<div class="log">actions</div>
 			<div class="bottom">
-				@for (int i = 0; i < 50; i++)
+				@foreach (string str in Lobby.Log)
 				{
-					<p>TODO: log</p>
+					<p>@str</p>
 				}
 			</div>
 		</div>
@@ -60,6 +60,16 @@
 					NavManager.NavigateTo("/");
 					return;
 				}
+
+				user.CurrentLobby = Lobby.ID;
+				error = await UserStore.UpdateUser(user, default);
+				if (error is not null)
+				{
+					Logger.LogError(error, "Failed to assign user to lobby");
+					NavManager.NavigateTo("/");
+					return;
+				}
+
 			} while (!await Lobby.TryAddPlayer(user));
 		}
 		else
@@ -79,6 +89,7 @@
 		}
 
 		Lobby.LobbyUpdated += LobbyUpdate;
+		StateHasChanged();
 	}
 
 	private Task LobbyUpdate(Lobby l)

@@ -5,9 +5,11 @@ public sealed class Lobby
 	public Guid ID { get; set; }
 	public Dictionary<string, int> PlayerIDMap { get; set; } = [];
 	public bool HasStarted { get; private set; }
-	public Game Game { get; set; } = new();
+	public Game Game { get; private set; } = new();
+	public IReadOnlyList<string> Log => log;
 	public event Func<Lobby, Task>? LobbyUpdated;
 	private readonly SemaphoreSlim semaphore = new(1);
+	private readonly List<string> log = ["Waiting: 0/4"];
 
 	public async Task<bool> TryAddPlayer(User user)
 	{
@@ -17,8 +19,10 @@ public sealed class Lobby
 		}
 		await semaphore.WaitAsync();
 		PlayerIDMap.Add(user.ID, 0);
+		log.Add($"Waiting: {PlayerIDMap.Count}/4");
 		if (PlayerIDMap.Count >= 4)
 		{
+			log.Add($"Game Started!");
 			HasStarted = true;
 		}
 		semaphore.Release();
