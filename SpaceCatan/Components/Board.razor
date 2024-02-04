@@ -27,25 +27,25 @@
 						</text>
 					}
 
-					@if (!ShowBuildIndicator(xCopy, yCopy, Direction.UP))
+					@if (ShowBuildIndicator(xCopy, yCopy, Direction.UP))
 					{
 						<text>
 							<text style="transform: scaleX(200%) rotate(180deg) translate(-25%, -10%); cursor: pointer; user-select: none;" dominant-baseline="middle" text-anchor="middle" stroke="white" fill="white" font-weight="bold" font-size="30px" @onclick="() => ClickRoad(xCopy, yCopy, Direction.UP)">V</text>
 						</text>
 					}
-					@if (!ShowBuildIndicator(xCopy, yCopy, Direction.DOWN))
+					@if (ShowBuildIndicator(xCopy, yCopy, Direction.DOWN))
 					{
 						<text>
 							<text style="transform: scaleX(200%) rotate(0deg) translate(25%, 90%); cursor: pointer; user-select: none;" dominant-baseline="middle" text-anchor="middle" stroke="white" fill="white" font-weight="bold" font-size="30px" @onclick="() => ClickRoad(xCopy, yCopy, Direction.DOWN)">V</text>
 						</text>
 					}
-					@if (!ShowBuildIndicator(xCopy, yCopy, Direction.LEFT))
+					@if (ShowBuildIndicator(xCopy, yCopy, Direction.LEFT))
 					{
 						<text>
 							<text style="transform: scaleY(200%) rotate(90deg) translate(25%, -10%); cursor: pointer; user-select: none;" dominant-baseline="middle" text-anchor="middle" stroke="white" fill="white" font-weight="bold" font-size="30px" @onclick="() => ClickRoad(xCopy, yCopy, Direction.LEFT)">V</text>
 						</text>
 					}
-					@if (!ShowBuildIndicator(xCopy, yCopy, Direction.RIGHT))
+					@if (ShowBuildIndicator(xCopy, yCopy, Direction.RIGHT))
 					{
 						<text>
 					<text style="transform: scaleY(200%) rotate(270deg) translate(-25%, 90%); cursor: pointer; user-select: none;" dominant-baseline="middle" text-anchor="middle" stroke="white" fill="white" font-weight="bold" font-size="30px" @onclick="() => ClickRoad(xCopy, yCopy, Direction.RIGHT)">V</text>
@@ -74,11 +74,22 @@
 
 	private bool ShowBuildIndicator(int x, int y, Direction direction)
 	{
-		return RoadsToBuild.Contains(new(x, y, direction));
+		return (x, y, direction) switch
+		{
+			(0, _, Direction.LEFT) => false,
+			(4, _, Direction.RIGHT) => false,
+			(_, 0, Direction.UP) => false,
+			(_, 4, Direction.DOWN) => false,
+			_ => !RoadsToBuild.Contains(new(x, y, direction)) && Game.Map.CanBuildRoadAt(x, y, direction, Game.CurrentPlayer)
+		};
 	}
 
 	private void ClickRoad(int x, int y, Direction direction, bool onlyRemove = false)
 	{
+		if (onlyRemove && ShowBuildIndicator(x, y, direction))
+		{
+			return;
+		}
 		RoadToBuild r = new(x, y, direction);
 		if (roadsToBuild.Contains(r))
 		{
