@@ -1,0 +1,28 @@
+﻿<div class="board">
+	@for (int y = 0; y < 5; y++)
+	{
+		@for (int x = 0; x < 5; x++)
+		{
+			<div class="cell">
+				<img src="@GetPlanetImage(Map.GetPlanet(x, y).Kind)" />
+			</div>
+		}
+	}
+</div>
+
+@code {
+	[Parameter]
+	public Map Map { get; set; } = null!;
+
+	private static string GetPlanetImage(PlanetKind kind) => kind switch
+	{
+		PlanetKind.GRAVITRONIUM => "/img/GravitroniumPlanet.png",
+		PlanetKind.COBALT => "/img/CobaltPlanet.png",
+		PlanetKind.OXYGEN => "/img/OxygenPlanet.png",
+		PlanetKind.FOOD => "/img/FoodPlanet.png",
+		PlanetKind.WATER => "/img/WaterPlanet.png",
+		PlanetKind.OUTPOST => "/img/Outpost.png",
+		PlanetKind.EMPTY => "/img/EmptyPlanet.png",
+		_ => ""
+	};
+}

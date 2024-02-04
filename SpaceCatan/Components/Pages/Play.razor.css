@@ -1,16 +1,4 @@
-﻿.board {
-	display: grid;
-	grid-template-rows: repeat(5, 1fr);
-	grid-template-columns: repeat(5, 1fr);
-	max-width: calc(min(80vh, 80vw));
-	margin: auto;
-}
-
-.cell {
-	aspect-ratio: 1 / 1;
-}
-
-.split {
+﻿.split {
 	display: grid;
 	grid-template-rows: repeat(2, 1fr);
 	grid-template-columns: repeat(1, 1fr);

@@ -11,17 +11,7 @@
 	<div class="columns">
 		<div class="column"></div>
 		<div class="column is-three-fifths p-0">
-			<div class="board">
-				@for (int y = 0; y < 5; y++)
-				{
-					@for (int x = 0; x < 5; x++)
-					{
-						<div class="cell">
-							TODO: planet<br />TODO: roads
-						</div>
-					}
-				}
-			</div>
+			<Board Map="@Lobby.Game.Map" />
 		</div>
 		<div class="column split">
 			<div class="log">actions</div>
@@ -38,7 +28,7 @@
 @code {
 	[CascadingParameter]
 	public Task<AuthenticationState> AuthenticationStateTask { get; set; } = null!;
-	private Lobby Lobby { get; set; } = null!;
+	private Lobby Lobby { get; set; } = new();
 
 	protected override async Task OnInitializedAsync()
 	{
