@@ -17,7 +17,7 @@
 					<line style="cursor: @GetRoadCursor(xCopy, yCopy, Direction.RIGHT);" x1="50%" y1="50%" x2="100%" y2="50%" stroke-width="15%" stroke="@GetRoadColor(x, y, Direction.RIGHT, roads.Right)" @onclick="() => ClickRoad(xCopy, yCopy, Direction.RIGHT, true)" />
 					@if (ShowColony(xCopy, yCopy))
 					{
-						<image style="filter: @GetColonyColor(xCopy, yCopy, p.Owner); pointer-events: none;" x="38.5%" y="5%" width="25%" height="25%" href="/img/VerySuperCoolColony.png" />
+						<image style="filter: @GetColonyColor(xCopy, yCopy, p.Owner); pointer-events: none; transform: rotate(-45deg)" x="-5%" y="30%" width="25%" height="25%" href="/img/VerySuperCoolColony.png" />
 					}
 					<image style="cursor: @GetPlanetCursor(xCopy, yCopy);" href="@GetPlanetImage(p.Kind)" x="20%" y="20%" width="60%" height="60%" @onclick="() => ClickPlanet(xCopy, yCopy)" />
 					@if (p.Kind is not (PlanetKind.EMPTY or PlanetKind.OUTPOST))
