@@ -13,7 +13,7 @@
 			@if (Lobby.HasStarted)
 			{
 				<div class="has-text-centered">
-					<p>You are: Player @PlayerID</p>
+					<p style="color: @Board.GetPlayerColor(PlayerID)">You are: Player @PlayerID</p>
 				</div>
 				<Resources PlayerID="@PlayerID" Game="@Lobby.Game" />
 			}
