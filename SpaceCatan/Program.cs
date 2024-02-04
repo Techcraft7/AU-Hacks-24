@@ -2,6 +2,7 @@ using Auth0.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using SpaceCatan.Components;
 using SpaceCatan.Endpoints;
+using SpaceCatan.Lobbies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,7 @@ builder.Services.AddDbContext<SpaceCatanContext>(o =>
     o.UseSqlite();
 });
 builder.Services.AddScoped<IUserStore, EFCoreUserStore>();
+builder.Services.AddSingleton<ILobbyStore, InMemoryLobbyStore>();
 
 builder.Services.AddAuth0WebAppAuthentication(o =>
 {
