@@ -31,7 +31,7 @@ public sealed class Lobby
 		{
 			log.Add($"Game Started!");
 			HasStarted = true;
-            string[] keys = [..PlayerIDMap.Keys];
+			string[] keys = [.. PlayerIDMap.Keys];
 			Random.Shared.Shuffle(keys);
 			for (int i = 0; i < 4; i++)
 			{

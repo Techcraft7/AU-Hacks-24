@@ -8,7 +8,7 @@ public sealed class InMemoryLobbyStore : ILobbyStore
 
 	public Task<(Lobby?, Exception?)> GetLobby(Guid id, CancellationToken cancellationToken)
 	{
-		if (lobbies.TryGetValue(id, out var lobby))
+		if (lobbies.TryGetValue(id, out Lobby? lobby))
 		{
 			return Task.FromResult<(Lobby?, Exception?)>((lobby, null));
 		}

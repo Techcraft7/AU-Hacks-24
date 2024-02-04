@@ -10,7 +10,7 @@ public static class LoginEndpoints
 	{
 		app.MapGet("/login", async (string? redirectUri, HttpContext ctx) =>
 		{
-			var properties = new LoginAuthenticationPropertiesBuilder()
+			AuthenticationProperties properties = new LoginAuthenticationPropertiesBuilder()
 				.WithRedirectUri(redirectUri ?? "/")
 				.Build();
 
@@ -18,7 +18,7 @@ public static class LoginEndpoints
 		});
 		app.MapGet("/signup", async (string? redirectUri, HttpContext ctx) =>
 		{
-			var properties = new LoginAuthenticationPropertiesBuilder()
+			AuthenticationProperties properties = new LoginAuthenticationPropertiesBuilder()
 				.WithRedirectUri(redirectUri ?? "/")
 				.WithParameter("screen_hint", "signup")
 				.Build();
@@ -27,7 +27,7 @@ public static class LoginEndpoints
 		});
 		app.MapGet("/logout", async (HttpContext ctx) =>
 		{
-			var properties = new LoginAuthenticationPropertiesBuilder()
+			AuthenticationProperties properties = new LoginAuthenticationPropertiesBuilder()
 				.WithRedirectUri("/")
 				.Build();
 

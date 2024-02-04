@@ -4,10 +4,10 @@ using SpaceCatan.Components;
 using SpaceCatan.Endpoints;
 using SpaceCatan.Lobbies;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+	.AddInteractiveServerComponents();
 builder.Services.AddCascadingAuthenticationState();
 
 builder.Services.AddDbContext<SpaceCatanContext>();
@@ -16,29 +16,29 @@ builder.Services.AddSingleton<ILobbyStore, InMemoryLobbyStore>();
 
 builder.Services.AddAuth0WebAppAuthentication(o =>
 {
-    o.Domain = builder.Configuration["Auth0:Domain"]!;
-    o.ClientId = builder.Configuration["Auth0:ClientID"]!;
+	o.Domain = builder.Configuration["Auth0:Domain"]!;
+	o.ClientId = builder.Configuration["Auth0:ClientID"]!;
 });
 builder.Services.AddOptions<OpenIdConnectOptions>(Auth0Constants.AuthenticationScheme)
-    .Configure<IServiceProvider>((o, sp) =>
-    {
-        o.Events.OnTokenValidated = async (ctx) =>
-        {
+	.Configure<IServiceProvider>((o, sp) =>
+	{
+		o.Events.OnTokenValidated = async (ctx) =>
+		{
 			if (ctx.Principal?.Identity?.IsAuthenticated is null or false)
-            {
-                return;
-            }
-            if (ctx?.Principal.FindFirst("id")?.Value is not string userID)
-            {
-                return;
-            }
+			{
+				return;
+			}
+			if (ctx?.Principal.FindFirst("id")?.Value is not string userID)
+			{
+				return;
+			}
 
-			using var scope = sp.CreateScope();
-			var (user, error) = await scope.ServiceProvider.GetRequiredService<IUserStore>().CreateUser(userID, default);
+			using IServiceScope scope = sp.CreateScope();
+			(User user, Exception error) = await scope.ServiceProvider.GetRequiredService<IUserStore>().CreateUser(userID, default);
 		};
-    });
+	});
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 app.UseStaticFiles();
 
@@ -47,7 +47,7 @@ app.UseAuthorization();
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+	.AddInteractiveServerRenderMode();
 app.MapLoginEndpoints();
 
 app.Run();
