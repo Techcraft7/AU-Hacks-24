@@ -1,6 +1,6 @@
 ﻿<div class="container">
 	<div class="actions">
-		<p>Buy Chaos Cards</p>
+		<p class="mb-2">Buy Chaos Cards</p>
 		<NumberPicker @ref="@Picker" Updated="Update" />
 		<p class="help">1 Chaos Card = 1 Cobalt + 1 Food + 1 Water</p>
 		<label class="checkbox has-text-light mt-3">
@@ -8,15 +8,23 @@
             Use a Chaos Card?
         </label>
         <hr />
-        <ul>
-            @foreach (var (k, v) in cost)
-            {
-                if (v > 0)
+        @if (cost.Values.Sum() == 0)
+        {
+            <p>Current actions would use no resources</p>
+        }
+        else
+        {
+            <ul>
+                @foreach (var (k, v) in cost)
                 {
-                    <li>@v @(FormatName(k.ToString()))</li>
+                    if (v > 0)
+                    {
+                        <li>@v @(FormatName(k.ToString()))</li>
+                    }
                 }
-            }
-        </ul>
+            </ul>
+        }
+        <hr />
     </div>
 	<button class="button is-success" disabled="@(!IsValidTurn)" @onclick="OnEndTurn">End Turn</button>
 	@if (!IsValidTurn)
