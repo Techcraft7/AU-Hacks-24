@@ -6,11 +6,18 @@
 			Planet p = Map.GetPlanet(x, y);
 			<div class="cell">
 				<svg viewBox="0 0 256 256" width="100%">
-					<image href="@GetPlanetImage(p.Kind)" width="100%" height="100%" />
+					@{
+						var roads = Map.GetRoads(x, y);
+					}
+					<line x1="50%" y1="50%" x2="50%" y2="0%" stroke-width="5%" stroke="@GetPlayerColor(roads.Up)" />
+					<line x1="50%" y1="50%" x2="50%" y2="100%" stroke-width="5%" stroke="@GetPlayerColor(roads.Down)" />
+					<line x1="50%" y1="50%" x2="0%" y2="50%" stroke-width="5%" stroke="@GetPlayerColor(roads.Left)" />
+					<line x1="50%" y1="50%" x2="100%" y2="50%" stroke-width="5%" stroke="@GetPlayerColor(roads.Right)" />
+					<image href="@GetPlanetImage(p.Kind)" x="20%" y="20%" width="60%" height="60%" />
 					@if (p.Kind is not (PlanetKind.EMPTY or PlanetKind.OUTPOST))
 					{
 						<text>
-							<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" stroke="white" font-weight="bold" font-size="150%">@p.Number</text>
+							<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" stroke="white" font-weight="bold" font-size="50px">@p.Number</text>
 						</text>
 					}
 				</svg>
@@ -33,5 +40,14 @@
 		PlanetKind.OUTPOST => "/img/Outpost.png",
 		PlanetKind.EMPTY => "/img/EmptyPlanet.png",
 		_ => ""
+	};
+
+	private static string GetPlayerColor(int? id) => id switch
+	{
+		1 => "red",
+		2 => "blue",
+		3 => "yellow",
+		4 => "green",
+		_ => "transparent"
 	};
 }
