@@ -13,7 +13,7 @@
             </label>
             <hr />
         }
-        @if (Lobby.Game.IsInSetup && false)
+        @if (Lobby.Game.IsInSetup)
         {
             <div class="has-text-centered mb-3">
                 <p class="title is-4 has-text-light">Setup Phase</p>
@@ -44,16 +44,16 @@
                 }
             </ul>
         }
-        @if (!Lobby.Game.IsInSetup || true)
+        @if (!Lobby.Game.IsInSetup)
         {
             <hr />
-            <button class="button is-link is-fullwidth" @onclick="OpenExchanger">Exchange</button>            
+            <button class="button is-link is-fullwidth" @onclick="OpenExchanger">Exchange</button>
         }
     </div>
-	<button class="button is-success" disabled="@(!IsValidTurn)" @onclick="OnEndTurn">End Turn</button>
-	@if (!IsValidTurn)
-	{
-		@if (Lobby.Game.IsInSetup)
+    <button class="button is-success" disabled="@(!IsValidTurn)" @onclick="OnEndTurn">End Turn</button>
+    @if (!IsValidTurn)
+    {
+        @if (Lobby.Game.IsInSetup)
         {
             <p class="help is-danger">Please place one Colony and one Hyperbridge!</p>
         }

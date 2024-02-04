@@ -29,9 +29,9 @@
 		</div>
 		<div class="column split">
 			<div class="log box has-background-dark has-text-light">
-				@if (Lobby.HasStarted || true)
+				@if (Lobby.HasStarted)
 				{
-					if (true || Lobby.HasStarted && Lobby.Game.CurrentPlayer == PlayerID)
+					if (Lobby.HasStarted && Lobby.Game.CurrentPlayer == PlayerID)
 					{
 						<Actions @ref="@actions" PlayerID="@PlayerID" User="@User" Lobby="@Lobby" RoadsToBuildRaw="@board?.RoadsToBuild" ColoniesToBuild="@board?.ColoniesToBuild" />
 					}
