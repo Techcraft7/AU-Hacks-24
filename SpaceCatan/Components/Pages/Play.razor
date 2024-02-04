@@ -20,6 +20,8 @@
 			else
 			{
 				<p>Waiting for the game to start...</p>
+				<br />
+				<p>Your resource list will appear here when the game starts</p>
 			}
 		</div>
 		<div class="column is-three-fifths p-0">
@@ -29,14 +31,27 @@
 			<div class="log box has-background-dark has-text-light">
 				@if (Lobby.HasStarted || true)
 				{
-					if (Lobby.Game.CurrentPlayer == PlayerID || true)
+					if (Lobby.HasStarted && Lobby.Game.CurrentPlayer == PlayerID)
 					{
 						<Actions @ref="@actions" PlayerID="@PlayerID" User="@User" Lobby="@Lobby" RoadsToBuildRaw="@board?.RoadsToBuild" ColoniesToBuild="@board?.ColoniesToBuild" />
 					}
-					else
+					else if (Lobby.HasStarted)
 					{
 						<p>Waiting for your turn...</p>
+						<br />
 						<p>Current player: @Lobby.Game.CurrentPlayer</p>
+					}
+					else
+					{
+						<p>Waiting for the game to start...</p>
+						<br />
+						<p>
+							Your options for your turn will be configured here.
+						</p>
+						<br />
+						<p>
+							Build colonies by clicking on planets, and build roads by clicking on the "V" shapes.
+						</p>
 					}
 				}
 				else
