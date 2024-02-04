@@ -8,18 +8,18 @@
             Use a Chaos Card?
         </label>
         <hr />
-        @if (cost.Values.Sum() == 0)
+        @if (resourceDeltas.Values.Sum() == 0)
         {
             <p>Current actions would use no resources</p>
         }
         else
         {
             <ul>
-                @foreach (var (k, v) in cost)
+                @foreach (var (k, v) in resourceDeltas)
                 {
                     if (v > 0)
                     {
-                        <li>@(-v) @(FormatName(k.ToString()))</li>
+                        <li>@v @(FormatName(k.ToString()))</li>
                     }
                 }
             </ul>
@@ -49,7 +49,7 @@
     public IReadOnlyList<ColonyToBuild> ColoniesToBuild { get; set; } = Array.Empty<ColonyToBuild>();
     public int DevelopmentCardsToBuy => Picker?.Count ?? 0;
     private NumberPicker Picker { get; set; } = null!;
-    private Dictionary<Resource, int> cost = [];
+    private Dictionary<Resource, int> resourceDeltas = [];
     private List<RoadToBuild> roadsToBuild = [];
     private bool UseDevCard
     {
@@ -64,7 +64,7 @@
 
     protected override void OnParametersSet()
     {
-        cost = new()
+        resourceDeltas = new()
         {
             [Resource.GRAVITRONIUM] = 0,
             [Resource.COBALT] = 0,
@@ -73,9 +73,9 @@
             [Resource.WATER] = 0,
         };
 
-        cost[Resource.COBALT] += DevelopmentCardsToBuy;
-        cost[Resource.FOOD] += DevelopmentCardsToBuy;
-        cost[Resource.WATER] += DevelopmentCardsToBuy;
+        resourceDeltas[Resource.COBALT] -= DevelopmentCardsToBuy;
+        resourceDeltas[Resource.FOOD] -= DevelopmentCardsToBuy;
+        resourceDeltas[Resource.WATER] -= DevelopmentCardsToBuy;
 
         roadsToBuild.Clear();
         foreach (var rtb in RoadsToBuildRaw ?? Array.Empty<RoadToBuild>())
@@ -86,21 +86,21 @@
             }
         }
 
-        cost[Resource.GRAVITRONIUM] += roadsToBuild.Count;
-        cost[Resource.COBALT] += roadsToBuild.Count;
+        resourceDeltas[Resource.GRAVITRONIUM] -= roadsToBuild.Count;
+        resourceDeltas[Resource.COBALT] -= roadsToBuild.Count;
 
-        cost[Resource.GRAVITRONIUM] += ColoniesToBuild?.Count ?? 0;
-        cost[Resource.OXYGEN] += ColoniesToBuild?.Count ?? 0;
-        cost[Resource.FOOD] += ColoniesToBuild?.Count ?? 0;
+        resourceDeltas[Resource.GRAVITRONIUM] -= ColoniesToBuild?.Count ?? 0;
+        resourceDeltas[Resource.OXYGEN] -= ColoniesToBuild?.Count ?? 0;
+        resourceDeltas[Resource.FOOD] -= ColoniesToBuild?.Count ?? 0;
 
         Player p = PlayerID is < 1 or > 4 ? default : Lobby.Game.Players[PlayerID - 1];
 
         IsValidTurn = true;
-        IsValidTurn &= p.Gravitronium >= cost[Resource.GRAVITRONIUM];
-        IsValidTurn &= p.Cobalt >= cost[Resource.COBALT];
-        IsValidTurn &= p.Oxygen >= cost[Resource.OXYGEN];
-        IsValidTurn &= p.Food >= cost[Resource.FOOD];
-        IsValidTurn &= p.Water >= cost[Resource.WATER];
+        IsValidTurn &= p.Gravitronium + resourceDeltas[Resource.GRAVITRONIUM] >= 0;
+        IsValidTurn &= p.Cobalt + resourceDeltas[Resource.COBALT] >= 0;
+        IsValidTurn &= p.Oxygen + resourceDeltas[Resource.OXYGEN] >= 0;
+        IsValidTurn &= p.Food + resourceDeltas[Resource.FOOD] >= 0;
+        IsValidTurn &= p.Water + resourceDeltas[Resource.WATER] >= 0;
         if (useDevCard)
         {
             IsValidTurn &= p.DevelopmentCards > 0;
