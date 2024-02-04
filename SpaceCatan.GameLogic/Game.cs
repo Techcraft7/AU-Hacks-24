@@ -29,6 +29,7 @@ public sealed class Game
 
 		Map.SetPlanetOwner(turn.X, turn.Y, playerID);
 		Map.SetRoad(turn.X, turn.Y, turn.Direction, playerID);
+		turnIndex++;
 	}
 
 	public void MakeTurn(int playerID, Turn turn)
