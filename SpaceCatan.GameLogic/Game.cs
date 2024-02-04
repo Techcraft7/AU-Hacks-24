@@ -18,6 +18,11 @@ public sealed class Game
 			{
 				ID = i + 1
 			};
+			AddResource(i + 1, Resource.GRAVITRONIUM, 999);
+			AddResource(i + 1, Resource.COBALT, 999);
+			AddResource(i + 1, Resource.OXYGEN, 999);
+			AddResource(i + 1, Resource.FOOD, 999);
+			AddResource(i + 1, Resource.WATER, 999);
 		}
 	}
 
@@ -37,15 +42,19 @@ public sealed class Game
 				{
 					continue;
 				}
-				AddResource(p.Owner, p.Kind switch
+				Resource? r = p.Kind switch
 				{
 					PlanetKind.GRAVITRONIUM => Resource.GRAVITRONIUM,
 					PlanetKind.COBALT => Resource.COBALT,
 					PlanetKind.OXYGEN => Resource.OXYGEN,
 					PlanetKind.FOOD => Resource.FOOD,
 					PlanetKind.WATER => Resource.WATER,
-					_ => throw new InvalidOperationException()
-				}, 1);
+					_ => null
+				};
+				if (r is not null)
+				{
+					AddResource(p.Owner, r.Value, 1);
+				}
 			}
 		}
 		return n;
@@ -181,7 +190,9 @@ public sealed class Game
 					DevelopmentCardData = new(DevelopmentCardKind.OVERTIME, 0, 0, 0);
 					break;
 				case 4: // Make a random planet empty (Industrialization)
-					while (true)
+					int maxTries = 9999;
+					x = y = 0;
+					while (maxTries-- > 0)
 					{
 						x = Random.Shared.Next(5);
 						y = Random.Shared.Next(5);

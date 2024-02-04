@@ -72,6 +72,8 @@ public sealed class Lobby
 		{
 			int current = Game.CurrentPlayer;
 			Game.MakeTurn(playerID, turn);
+
+            log.Add($"Picking resource #{Game.GiveResources()}");
 			if (Game.DevelopmentCardData is DevelopmentCardPlayedData data)
 			{
 				log.Add(data.Kind switch
@@ -85,9 +87,7 @@ public sealed class Lobby
 					_ => "A Chaos Card was played!"
 				});
 			}
-
-            log.Add($"Picking resource #{Game.GiveResources()}");
-        }
+		}
 		semaphore.Release();
 		await Update();
 	}
