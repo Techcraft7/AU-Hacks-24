@@ -1,4 +1,6 @@
-﻿namespace SpaceCatan.GameLogic;
+﻿using System.Numerics;
+
+namespace SpaceCatan.GameLogic;
 
 public sealed class Map
 {
@@ -98,7 +100,17 @@ public sealed class Map
         planets[x, y].Owner = player;
     }
 
-    public Roads GetRoads(int x, int y)
+	public void SetPlanetKind(int x, int y, PlanetKind kind)
+    {
+		if (x < 0 || y < 0 || x >= 5 || y >= 5)
+		{
+			return;
+		}
+        planets[x, y].Kind = kind;
+	}
+
+
+	public Roads GetRoads(int x, int y)
     {
         if (x < 0 || y < 0 || x >= 5 || y >= 5)
         {
