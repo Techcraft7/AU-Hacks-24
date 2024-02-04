@@ -3,6 +3,10 @@
 		<p>Buy Chaos Cards</p>
 		<NumberPicker @ref="@Picker" Updated="Update" />
 		<p class="help">1 Chaos Card = 1 Cobalt + 1 Food + 1 Water</p>
+		<label class="checkbox has-text-light mt-3">
+            <input type="checkbox" @bind-value="@useDevCard" />
+            Use a Chaos Card?
+        </label>
         <hr />
         <ul>
             @foreach (var (k, v) in cost)
@@ -39,6 +43,7 @@
     private NumberPicker Picker { get; set; } = null!;
     private Dictionary<Resource, int> cost = [];
     private List<RoadToBuild> roadsToBuild = [];
+    private bool useDevCard = false;
 
     protected override void OnParametersSet()
     {
@@ -79,6 +84,10 @@
         IsValidTurn &= p.Oxygen >= cost[Resource.OXYGEN];
         IsValidTurn &= p.Food >= cost[Resource.FOOD];
         IsValidTurn &= p.Water >= cost[Resource.WATER];
+        if (useDevCard)
+        {
+            IsValidTurn &= p.DevelopmentCards > 0;
+        }
     }
 
     private async Task OnEndTurn()
@@ -88,7 +97,7 @@
             return;
         }
 
-        await Lobby.PlayTurn(User, new(roadsToBuild.ToArray(), ColoniesToBuild.ToArray(), [], DevelopmentCardsToBuy, false));
+        await Lobby.PlayTurn(User, new(roadsToBuild.ToArray(), ColoniesToBuild.ToArray(), [], DevelopmentCardsToBuy, useDevCard));
     }
 
     public void Update()
