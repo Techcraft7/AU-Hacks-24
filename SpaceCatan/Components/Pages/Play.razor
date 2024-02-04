@@ -13,7 +13,7 @@
 			@if (Lobby.HasStarted)
 			{
 				<div class="has-text-centered">
-					<p>You are: Player @PlayerID</p>
+					<p style="color: @Board.GetPlayerColor(PlayerID)">You are: Player @PlayerID</p>
 				</div>
 				<Resources PlayerID="@PlayerID" Game="@Lobby.Game" />
 			}
@@ -29,7 +29,15 @@
 			<div class="log box has-background-dark has-text-light">
 				@if (Lobby.HasStarted || true)
 				{
-					<Actions PlayerID="@PlayerID" Game="@Lobby.Game" />
+					if (Lobby.Game.CurrentPlayer == PlayerID || true)
+					{
+						<Actions PlayerID="@PlayerID" Game="@Lobby.Game" />
+					}
+					else
+					{
+						<p>Waiting for your turn...</p>
+						<p>Current player: @Lobby.Game.CurrentPlayer</p>
+					}
 				}
 				else
 				{
