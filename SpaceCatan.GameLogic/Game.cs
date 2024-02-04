@@ -5,6 +5,7 @@ public sealed class Game
 	public Map Map { get; set; } = new();
 	public Player[] Players { get; set; } = new Player[4];
 	public int CurrentPlayer => (turnIndex % Players.Length) + 1;
+	public int TurnIndex => turnIndex;
 	public bool IsInSetup => turnIndex < Players.Length;
 	public DevelopmentCardPlayedData? DevelopmentCardData { get; set; }
 	private int turnIndex = 0;
@@ -18,6 +19,36 @@ public sealed class Game
 				ID = i + 1
 			};
 		}
+	}
+
+	public int GiveResources()
+	{
+		int n = Random.Shared.Next(4) + 1;
+		for (int x = 0; x < 5; x++)
+		{
+			for (int y = 0; y < 5; y++)
+			{
+				Planet p = Map.GetPlanet(x, y);
+				if (p.Owner < 1)
+				{
+					continue;
+				}
+				if (p.Number != n)
+				{
+					continue;
+				}
+				AddResource(p.Owner, p.Kind switch
+				{
+					PlanetKind.GRAVITRONIUM => Resource.GRAVITRONIUM,
+					PlanetKind.COBALT => Resource.COBALT,
+					PlanetKind.OXYGEN => Resource.OXYGEN,
+					PlanetKind.FOOD => Resource.FOOD,
+					PlanetKind.WATER => Resource.WATER,
+					_ => throw new InvalidOperationException()
+				}, 1);
+			}
+		}
+		return n;
 	}
 
 	public void MakeSetupTurn(int playerID, SetupTurn turn)

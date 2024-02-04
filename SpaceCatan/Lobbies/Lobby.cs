@@ -50,6 +50,12 @@ public sealed class Lobby
 		if (Game.IsInSetup)
 		{
 			Game.MakeSetupTurn(playerID, turn);
+
+			// This will happen after the last player finishes the setup
+			if (Game.TurnIndex >= 4)
+			{
+				log.Add($"Picking resource #{Game.GiveResources()}");
+			}
 		}
 		semaphore.Release();
 		await Update();
@@ -65,7 +71,8 @@ public sealed class Lobby
 		if (!Game.IsInSetup)
 		{
 			Game.MakeTurn(playerID, turn);
-		}
+            log.Add($"Picking resource #{Game.GiveResources()}");
+        }
 		semaphore.Release();
 		await Update();
 	}
