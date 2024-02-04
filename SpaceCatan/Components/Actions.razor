@@ -180,7 +180,7 @@
         {
             var (x, y) = ColoniesToBuild.Single();
             var (_, _, dir) = roadsToBuild.Single();
-            await Lobby.PlaySetupTurn(User, new(x, y, dir));
+            await Lobby.PlaySetupTurn(User.ID, new(x, y, dir));
             return;
         }
 
@@ -195,7 +195,7 @@
 
         PopulateResourceDictWithExchanges(exhcanges);
 
-        await Lobby.PlayTurn(User, new(roadsToBuild.ToArray(), ColoniesToBuild.ToArray(), exhcanges, DevelopmentCardsToBuy, useDevCard));
+        await Lobby.PlayTurn(User.ID, new(roadsToBuild.ToArray(), ColoniesToBuild.ToArray(), exhcanges, DevelopmentCardsToBuy, useDevCard));
     }
 
     public void Update()

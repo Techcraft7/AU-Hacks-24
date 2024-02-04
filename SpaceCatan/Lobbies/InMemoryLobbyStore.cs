@@ -1,7 +1,9 @@
 ﻿
+using Microsoft.Extensions.Logging;
+
 namespace SpaceCatan.Lobbies;
 
-public sealed class InMemoryLobbyStore : ILobbyStore
+public sealed class InMemoryLobbyStore(ILogger<InMemoryLobbyStore> logger) : ILobbyStore
 {
 	private readonly SemaphoreSlim semaphore = new(1);
 	private readonly SortedDictionary<Guid, Lobby> lobbies = [];
@@ -30,10 +32,12 @@ public sealed class InMemoryLobbyStore : ILobbyStore
 
 		await semaphore.WaitAsync(cancellationToken);
 		lobbies.Add(lobby.ID, lobby);
+		logger.LogInformation("Created lobby {id}", lobby.ID);
 		lobby.OnGameEnd += async (l) =>
 		{
 			await semaphore.WaitAsync();
 			lobbies.Remove(l.ID);
+			logger.LogInformation("Deleted lobby {id}", lobby.ID);
 			semaphore.Release();
 		};
 		semaphore.Release();
