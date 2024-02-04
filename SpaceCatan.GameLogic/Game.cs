@@ -84,4 +84,30 @@ public sealed class Game
 		Players[playerID - 1] = p;
 		turnIndex++;
 	}
+
+	public int? GetWinner()
+	{
+		Span<int> counts = stackalloc int[4];
+		counts.Clear();
+		for (int x = 0; x < 5; x++)
+		{
+			for (int y = 0; y < 5; y++)
+			{
+				Planet p = Map.GetPlanet(x, y);
+				if (p.Owner is >= 1 and <= 4)
+				{
+					counts[p.Owner] += 1;
+				}
+			}
+		}
+
+		for (int i = 0; i < 4; i++)
+		{
+			if (counts[i] >= 5)
+			{
+				return i + 1;
+			}
+		}
+		return null;
+	}
 }
