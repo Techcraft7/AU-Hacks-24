@@ -10,7 +10,7 @@
 <section class="section">
 	<div class="columns">
 		<div class="column box has-background-dark has-text-light">
-			@if (Lobby.HasStarted || true)
+			@if (Lobby.HasStarted)
 			{
 				<div class="has-text-centered">
 					<p>You are: Player @PlayerID</p>
@@ -27,9 +27,9 @@
 		</div>
 		<div class="column split">
 			<div class="log box has-background-dark has-text-light">
-				@if (Lobby.HasStarted)
+				@if (Lobby.HasStarted || true)
 				{
-					<p>TODO: actions</p>
+					<Actions PlayerID="@PlayerID" Game="@Lobby.Game" />
 				}
 				else
 				{
