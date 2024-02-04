@@ -8,15 +8,20 @@
 	<div class="container">
 		<div class="columns">
 			<div class="column is-hidden-mobile"></div>
-			<div class="column is-two-thirds">
+			<div class="column is-two-thirds box has-background-dark">
 				<div class="has-text-centered mb-5">
 					<p class="title is-1 has-text-light">
 						@Username
 					</p>
 				</div>
-				<div class="has-text-centered">
-					<p>
+				<div class="has-text-centered mb-5">
+					<p class="subtitle has-text-light">
 						@User.Wins wins
+					</p>
+				</div>
+				<div class="has-text-centered">
+					<p class="subtitle has-text-light">
+						@(User.CurrentLobby is null ? "Not playing a game" : "Currently in a game")
 					</p>
 				</div>
 			</div>
