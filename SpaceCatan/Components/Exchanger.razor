@@ -17,7 +17,7 @@
 			<br />
 			<div class="columns is-mobile mx-3">
 				<div class="column">
-					<button class="button is-danger is-fullwidth" @onclick="() => steps.RemoveAt(steps.Count - 1)">Remove Step</button>
+					<button class="button is-danger is-fullwidth" @onclick="RemoveLast">Remove Step</button>
 				</div>
 				<div class="column">
 					<button class="button is-success is-fullwidth" @onclick="() => steps.Add(new())">Add Step</button>
@@ -48,6 +48,14 @@
 	private readonly List<Step> steps = [];
 
 	public void Update() => StateHasChanged();
+
+	private void RemoveLast()
+	{
+		if (steps.Count > 0)
+		{
+			steps.RemoveAt(steps.Count - 1);
+		}
+	}
 
 	public async Task Close()
 	{
