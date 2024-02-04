@@ -1,0 +1,15 @@
+﻿<div class="field has-addons">
+	<p class="control">
+		<button class="button" @onclick="() => Count = Math.Max(0, Count - 1)">-</button>
+	</p>
+	<p class="control is-expanded">
+		<button class="button is-fullwidth">@Count</button>
+	</p>
+	<p class="control">
+		<button class="button" @onclick="() => Count++">+</button>
+	</p>
+</div>
+
+@code {
+	public int Count { get; set; }
+}

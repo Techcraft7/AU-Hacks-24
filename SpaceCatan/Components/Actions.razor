@@ -1,8 +1,13 @@
 ﻿<div class="container">
 	<div class="actions">
-		TODO: preview actions
+		<p>Buy Development Cards</p>
+		<NumberPicker @ref="@Picker" />
 	</div>
-	<button class="button is-success">End Turn</button>
+	<button class="button is-success" disabled="@(!IsValidTurn)">End Turn</button>
+	@if (!IsValidTurn)
+	{
+		<p class="help is-danger">Not enough resources!</p>
+	}
 </div>
 
 
@@ -11,4 +16,8 @@
 	public int PlayerID { get; set; }
 	[Parameter]
 	public Game Game { get; set; } = new();
+	[Parameter]
+	public bool IsValidTurn { get; set; } = false;
+	public int DevelopmentCardsToBuy => Picker?.Count ?? 0;
+	private NumberPicker Picker { get; set; } = null!;
 }
