@@ -6,6 +6,7 @@ public sealed class Game
 	public Player[] Players { get; set; } = new Player[4];
 	public int CurrentPlayer => (turnIndex % Players.Length) + 1;
 	public bool IsInSetup => turnIndex < Players.Length;
+	public DevelopmentCardPlayedData? DevelopmentCardData { get; set; }
 	private int turnIndex = 0;
 
 	public Game()
@@ -82,73 +83,81 @@ public sealed class Game
 		if (turn.DevelopmentCardUsed)
 		{
 			p.DevelopmentCards -= 1;
+			switch (Random.Shared.Next(6))
+			{
+				case 0: // Steal 2 resources (Heist)
+					// TODO
+					DevelopmentCardData = new(DevelopmentCardKind.HEIST, 0, 0, 0);
+					break;
+				case 1: // Nuke a colony (Nuke)
+					int x, y;
+					while (true)
+					{
+						x = Random.Shared.Next(5);
+						y = Random.Shared.Next(5);
+						int owner = Map.GetPlanet(x, y).Owner;
+						if (owner >= 1 && owner != playerID)
+						{
+							break;
+						}
+					}
+					Map.SetPlanetOwner(x, y, 0);
+					Map.SetRoad(x, y, Direction.UP, 0);
+					Map.SetRoad(x, y, Direction.DOWN, 0);
+					Map.SetRoad(x, y, Direction.LEFT, 0);
+					Map.SetRoad(x, y, Direction.RIGHT, 0);
+					DevelopmentCardData = new(DevelopmentCardKind.NUKE, x, y, 0);
+					break;
+				case 2: // Everybody loses 1 of a random resource (Drought)
+					// TODO
+					DevelopmentCardData = new(DevelopmentCardKind.HEIST, 0, 0, 0);
+					break;
+				case 3: // Make it your turn again (Overtime)
+					turnIndex--;
+					DevelopmentCardData = new(DevelopmentCardKind.OVERTIME, 0, 0, 0);
+					break;
+				case 4: // Make a random planet empty (Industrialization)
+					while (true)
+					{
+						x = Random.Shared.Next(5);
+						y = Random.Shared.Next(5);
+						if (Map.GetPlanet(x, y).Kind is not (PlanetKind.EMPTY or PlanetKind.OUTPOST))
+						{
+							break;
+						}
+					}
+					Map.SetPlanetKind(x, y, PlanetKind.EMPTY);
+					DevelopmentCardData = new(DevelopmentCardKind.INDUSTRIALIZATION, x, y, 0);
+					break;
+				case 5: // A random planet becomes a different resource (Climate Change)
+					while (true)
+					{
+						x = Random.Shared.Next(5);
+						y = Random.Shared.Next(5);
+						if (Map.GetPlanet(x, y).Kind is not (PlanetKind.EMPTY or PlanetKind.OUTPOST))
+						{
+							break;
+						}
+					}
+					// Pick random resource (but different from current)
+					Span<PlanetKind> kinds = [PlanetKind.GRAVITRONIUM, PlanetKind.COBALT, PlanetKind.OXYGEN, PlanetKind.FOOD, PlanetKind.WATER];
+					for (int i = 0; i < kinds.Length; i++)
+					{
+						if (kinds[i] == Map.GetPlanet(x, y).Kind)
+						{
+							kinds[i] = kinds[^1];
+							kinds = kinds[..^1];
+							break;
+						}
+					}
+					Map.SetPlanetKind(x, y, kinds[Random.Shared.Next(kinds.Length)]);
+					DevelopmentCardData = new(DevelopmentCardKind.CLIMATE_CHANGE, x, y, 0);
+					break;
+			}
 		}
-		switch (Random.Shared.Next(6))
+		else
 		{
-			case 0: // Steal 2 resources (Heist)
-				// TODO
-				break;
-			case 1: // Nuke a colony (Nuke)
-				int x, y;
-				while (true)
-				{
-					x = Random.Shared.Next(5);
-					y = Random.Shared.Next(5);
-					int owner = Map.GetPlanet(x, y).Owner;
-					if (owner >= 1 && owner != playerID)
-					{
-						break;
-					}
-				}
-				Map.SetPlanetOwner(x, y, 0);
-				Map.SetRoad(x, y, Direction.UP, 0);
-				Map.SetRoad(x, y, Direction.DOWN, 0);
-				Map.SetRoad(x, y, Direction.LEFT, 0);
-				Map.SetRoad(x, y, Direction.RIGHT, 0);
-				break;
-			case 2: // Everybody loses 1 of a random resource (Drought)
-				// TODO
-				break;
-			case 3: // Make it your turn again (Overtime)
-				turnIndex--;
-				break;
-			case 4: // Make a random planet empty (Industrialization)
-				// int x, y; Already defined above (switch scoping is goofy)
-				while (true)
-				{
-					x = Random.Shared.Next(5);
-					y = Random.Shared.Next(5);
-					if (Map.GetPlanet(x, y).Kind is not (PlanetKind.EMPTY or PlanetKind.OUTPOST))
-					{
-						break;
-					}
-				}
-				Map.SetPlanetKind(x, y, PlanetKind.EMPTY);
-				break;
-			case 5: // A random planet becomes a different resource (Climate Change)
-				// int x, y; Already defined above (switch scoping is goofy)
-				while (true)
-				{
-					x = Random.Shared.Next(5);
-					y = Random.Shared.Next(5);
-					if (Map.GetPlanet(x, y).Kind is not (PlanetKind.EMPTY or PlanetKind.OUTPOST))
-					{
-						break;
-					}
-				}
-				// Pick random resource (but different from current)
-				Span<PlanetKind> kinds = [PlanetKind.GRAVITRONIUM, PlanetKind.COBALT, PlanetKind.OXYGEN, PlanetKind.FOOD, PlanetKind.WATER];
-				for (int i = 0; i < kinds.Length; i++)
-				{
-					if (kinds[i] == Map.GetPlanet(x, y).Kind)
-					{
-						kinds[i] = kinds[^1];
-						kinds = kinds[..^1];
-						break;
-					}
-				}
-				Map.SetPlanetKind(x, y, kinds[Random.Shared.Next(kinds.Length)]);
-				break;
+			DevelopmentCardData = null;
 		}
 
 		Players[playerID - 1] = p;
