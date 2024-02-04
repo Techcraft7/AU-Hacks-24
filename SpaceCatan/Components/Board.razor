@@ -80,15 +80,15 @@
 
 	private string GetPlanetCursor(int x, int y)
 	{
+		if (Game.CurrentPlayer != PlayerID || !Game.Map.CanBuildColonyAt(x, y, PlayerID, roadsToBuild))
+		{
+			return "unset";
+		}
 		if (Game.IsInSetup)
 		{
 			return Game.Map.GetPlanet(x, y).Kind is not (PlanetKind.EMPTY or PlanetKind.OUTPOST)
 				? "pointer"
 				: "not-allowed";
-		}
-		if (Game.CurrentPlayer != PlayerID || !Game.Map.CanBuildColonyAt(x, y, PlayerID, roadsToBuild))
-		{
-			return "unset";
 		}
 		return "pointer";
 	}
