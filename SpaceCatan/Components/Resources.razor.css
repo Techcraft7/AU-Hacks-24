@@ -13,6 +13,7 @@
 .list p {
 	display: inline;
 	margin: auto;
+	min-width: 25px;
 }
 
 .list div {

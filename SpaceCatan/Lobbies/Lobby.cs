@@ -11,6 +11,7 @@ public sealed class Lobby
 	public event Func<Lobby, Task>? LobbyUpdated;
 	private readonly SemaphoreSlim semaphore = new(1);
 	private readonly List<string> log = [];
+	private readonly Dictionary<string, bool> LeftPlayers = [];
 
 	public async Task<bool> TryAddPlayer(User user)
 	{
@@ -34,6 +35,7 @@ public sealed class Lobby
 			for (int i = 0; i < 4; i++)
 			{
 				PlayerIDMap[keys[i]] = i + 1;
+				LeftPlayers[keys[i]] = false;
 			}
 		}
 		semaphore.Release();
@@ -41,9 +43,47 @@ public sealed class Lobby
 		return true;
 	}
 
-	public async Task PlaySetupTurn(User user, SetupTurn turn)
+	public async Task LeaveAsync(User user)
 	{
-		if (!PlayerIDMap.TryGetValue(user.ID, out int playerID))
+		await semaphore.WaitAsync();
+		if (HasStarted)
+		{
+			LeftPlayers[user.ID] = true;
+			if (Game.CurrentPlayer == PlayerIDMap.GetValueOrDefault(user.ID))
+			{
+				await PlayBotMove(user.ID);
+			}
+			return;
+		}
+		PlayerIDMap.Remove(user.ID);
+		log.Add($"Waiting... {PlayerIDMap.Count}/4");
+		semaphore.Release();
+		await Update();
+	}
+
+	private async Task PlayBotMove(string userID)
+	{
+		if (Game.IsInSetup)
+		{
+			int x, y;
+			Direction dir;
+			do
+			{
+				x = Random.Shared.Next(5);
+				y = Random.Shared.Next(5);
+				dir = (Direction)Random.Shared.Next(4);
+			} while (Game.Map.GetPlanet(x, y).Owner != 0 || Game.Map.GetRoad(x, y, dir) != 0);
+			await PlaySetupTurn(userID, new(x, y, dir));
+		}
+		else
+		{
+			await PlayTurn(userID, new([], [], [], 0, false));
+		}
+	}
+
+	public async Task PlaySetupTurn(string userID, SetupTurn turn)
+	{
+		if (!PlayerIDMap.TryGetValue(userID, out int playerID))
 		{
 			return;
 		}
@@ -60,11 +100,15 @@ public sealed class Lobby
 		}
 		semaphore.Release();
 		await Update();
+		if (HasCurrentPlayerLeft(out string nextID))
+		{
+			await PlayBotMove(nextID);
+		}
 	}
 
-	public async Task PlayTurn(User user, Turn turn)
+	public async Task PlayTurn(string userID, Turn turn)
 	{
-		if (!PlayerIDMap.TryGetValue(user.ID, out int playerID))
+		if (!PlayerIDMap.TryGetValue(userID, out int playerID))
 		{
 			return;
 		}
@@ -72,9 +116,10 @@ public sealed class Lobby
 		if (!Game.IsInSetup)
 		{
 			int current = Game.CurrentPlayer;
+
 			Game.MakeTurn(playerID, turn);
 
-            log.Add($"Picking resource #{Game.GiveResources()}");
+			log.Add($"Picking resource #{Game.GiveResources()}");
 			if (Game.DevelopmentCardData is DevelopmentCardPlayedData data)
 			{
 				log.Add(data.Kind switch
@@ -97,7 +142,22 @@ public sealed class Lobby
 		}
 		semaphore.Release();
 		await Update();
+		if (HasCurrentPlayerLeft(out string nextID))
+		{
+			await PlayBotMove(nextID);
+		}
 	}
 
-	private async Task Update() => await (LobbyUpdated?.Invoke(this) ?? Task.CompletedTask);
+	private async Task Update()
+	{
+		await semaphore.WaitAsync();
+		semaphore.Release();
+		await (LobbyUpdated?.Invoke(this) ?? Task.CompletedTask);
+		if (HasStarted && LeftPlayers.Values.All(x => x))
+		{
+			Winner = 0;
+		}
+	}
+
+	private bool HasCurrentPlayerLeft(out string userID) => LeftPlayers.GetValueOrDefault(userID = PlayerIDMap.FirstOrDefault(kv => kv.Value == Game.CurrentPlayer).Key);
 }
