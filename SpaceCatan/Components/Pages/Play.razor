@@ -1,8 +1,10 @@
 ﻿@page "/play"
+@implements IDisposable
 @attribute [Authorize]
 @inject IUserStore UserStore
 @inject ILogger<Play> Logger
 @inject NavigationManager NavManager
+@inject ILobbyStore LobbyStore
 @rendermode InteractiveServer
 
 <section class="section">
@@ -53,6 +55,21 @@
 
 		if (user?.CurrentLobby is null)
 		{
+			(Lobby, error) = await LobbyStore.GetJoinableLobby(default);
+		}
+		else
+		{
+			(Lobby? l, error) = await LobbyStore.GetLobby(user.CurrentLobby.Value, default);
+			if (l is null)
+			{
+				NavManager.NavigateTo("/");
+				return;
+			}
+		}
+
+		if (error is not null)
+		{
+			Logger.LogError(error, "Failed to get lobby");
 			NavManager.NavigateTo("/");
 			return;
 		}
@@ -65,4 +82,6 @@
 		Lobby = l;
 		return Task.CompletedTask;
 	}
+
+	public void Dispose() => Lobby.LobbyUpdated -= LobbyUpdate;
 }
