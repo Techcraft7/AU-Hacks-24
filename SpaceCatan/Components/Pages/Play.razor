@@ -42,26 +42,40 @@
 			NavManager.NavigateTo("/");
 			return;
 		}
-
-		if (user?.CurrentLobby is null)
+		if (user is null)
 		{
-			(Lobby, error) = await LobbyStore.GetJoinableLobby(default);
+			Logger.LogWarning("Non-existent user tried to join a game");
+			NavManager.NavigateTo("/");
+			return;
+		}
+
+		if (user.CurrentLobby is null)
+		{
+			do
+			{
+				(Lobby, error) = await LobbyStore.GetJoinableLobby(default);
+				if (error is not null)
+				{
+					Logger.LogError(error, "Failed to get lobby");
+					NavManager.NavigateTo("/");
+					return;
+				}
+			} while (!await Lobby.TryAddPlayer(user));
 		}
 		else
 		{
 			(Lobby? l, error) = await LobbyStore.GetLobby(user.CurrentLobby.Value, default);
+			if (error is not null)
+			{
+				Logger.LogError(error, "Failed to get lobby");
+				NavManager.NavigateTo("/");
+				return;
+			}
 			if (l is null)
 			{
 				NavManager.NavigateTo("/");
 				return;
 			}
-		}
-
-		if (error is not null)
-		{
-			Logger.LogError(error, "Failed to get lobby");
-			NavManager.NavigateTo("/");
-			return;
 		}
 
 		Lobby.LobbyUpdated += LobbyUpdate;
