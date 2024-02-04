@@ -72,6 +72,7 @@ public sealed class Game
 		p.Oxygen += resources[Resource.OXYGEN];
 		p.Water += resources[Resource.WATER];
 		p.Food += resources[Resource.FOOD];
+		p.DevelopmentCards += turn.DevelopmentCardsBought;
 
 		// Build roads
 		foreach (RoadToBuild r in turn.Roads)
