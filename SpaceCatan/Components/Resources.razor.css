@@ -1,0 +1,23 @@
+﻿.list {
+	padding-top: 1rem;
+	padding-bottom: 1rem;
+	display: grid;
+	grid-template-rows: 1fr;
+}
+
+.list img {
+	max-height: 12vh;
+}
+
+.list p {
+	display: inline;
+	margin: auto;
+}
+
+.list div {
+	margin: auto;
+}
+
+.columns.is-mobile p {
+	text-align: center;
+}

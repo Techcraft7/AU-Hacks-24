@@ -1,8 +1,63 @@
-﻿<p>TODO: resources</p>
+﻿<div class="list is-hidden-mobile">
+	@foreach (Resource r in RESOURCES)
+	{
+		<div>
+			<img src="@GetResourceImage(r)" />
+			<p>
+				@GetResourceCount(r)
+			</p>
+		</div>
+	}
+	<div>
+		<img src="/img/Food.png" />
+		<p>
+			@(PlayerID is < 1 or > 4 ? 0 : Game.Players[PlayerID - 1].DevelopmentCards)
+		</p>
+	</div>
+</div>
+<div class="columns is-mobile is-hidden-tablet">
+	@foreach (Resource r in RESOURCES)
+	{
+		<div class="column">
+			<p>
+				@GetResourceCount(r)
+			</p>
+			<img src="@GetResourceImage(r)" />
+		</div>
+	}
+	<div class="column">
+		<p>
+			@(PlayerID is < 1 or > 4 ? 0 : Game.Players[PlayerID - 1].DevelopmentCards)
+		</p>
+		<img src="/img/DevCard.png" />
+	</div>
+</div>
 
 @code {
 	[Parameter]
 	public int PlayerID { get; set; }
 	[Parameter]
 	public Game Game { get; set; } = new();
+	private static readonly Resource[] RESOURCES = [Resource.GRAVITRONIUM, Resource.COBALT, Resource.OXYGEN, Resource.FOOD, Resource.WATER];
+
+
+	private int GetResourceCount(Resource r) => PlayerID is < 1 or > 4 ? 0 : r switch
+	{
+		Resource.GRAVITRONIUM => Game.Players[PlayerID - 1].Gravitronium,
+		Resource.COBALT => Game.Players[PlayerID - 1].Cobalt,
+		Resource.OXYGEN => Game.Players[PlayerID - 1].Oxygen,
+		Resource.FOOD => Game.Players[PlayerID - 1].Food,
+		Resource.WATER => Game.Players[PlayerID - 1].Water,
+		_ => 0
+	};
+
+	private string GetResourceImage(Resource r) => r switch
+	{
+		Resource.GRAVITRONIUM => "/img/Gravitronium.png",
+		Resource.COBALT => "/img/Cobalt.png",
+		Resource.OXYGEN => "/img/Oxygen.png",
+		Resource.FOOD => "/img/Food.png",
+		Resource.WATER => "/img/Water.png",
+		_ => ""
+	};
 }
