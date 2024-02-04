@@ -4,7 +4,9 @@
 		@for (int x = 0; x < 5; x++)
 		{
 			<div class="cell">
-				<img src="@GetPlanetImage(Map.GetPlanet(x, y).Kind)" />
+				<svg viewBox="0 256 256" width="100%">
+					<image href="@GetPlanetImage(Map.GetPlanet(x, y).Kind)" width="100%" height="100%" />
+				</svg>
 			</div>
 		}
 	}

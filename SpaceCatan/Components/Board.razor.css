@@ -11,7 +11,7 @@
 	aspect-ratio: 1 / 1;
 }
 
-.cell img {
+.cell svg {
 	width: 60%;
 	height: 60%;
 	margin: auto;
