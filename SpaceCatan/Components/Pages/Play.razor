@@ -23,7 +23,7 @@
 			}
 		</div>
 		<div class="column is-three-fifths p-0">
-			<Board Game="@Lobby.Game" />
+			<Board Game="@Lobby.Game" @ref="@board" UpdatedCallback="() => actions.Update()" />
 		</div>
 		<div class="column split">
 			<div class="log box has-background-dark has-text-light">
@@ -31,7 +31,7 @@
 				{
 					if (Lobby.Game.CurrentPlayer == PlayerID || true)
 					{
-						<Actions PlayerID="@PlayerID" Game="@Lobby.Game" />
+						<Actions @ref="@actions" PlayerID="@PlayerID" User="@User" Lobby="@Lobby" RoadsToBuildRaw="@board?.RoadsToBuild" ColoniesToBuild="@board?.ColoniesToBuild" />
 					}
 					else
 					{
@@ -60,6 +60,9 @@
 	private Lobby Lobby { get; set; } = new();
 	private string UserID { get; set; } = "";
 	private int PlayerID => Lobby.PlayerIDMap.GetValueOrDefault(UserID);
+	private Board board = null!;
+	private Actions actions = null!;
+	private User User { get; set; } = new();
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -79,6 +82,7 @@
 			NavManager.NavigateTo("/");
 			return;
 		}
+		User = user;
 
 		if (user.CurrentLobby is null)
 		{
@@ -122,13 +126,16 @@
 			Lobby = l;
 		}
 
-// #if DEBUG
-// 	Logger.LogInformation($"Put user {user.ID} in lobby {Lobby.ID}");
-// #endif
+		// #if DEBUG
+		// 	Logger.LogInformation($"Put user {user.ID} in lobby {Lobby.ID}");
+		// #endif
 
 		Lobby.LobbyUpdated += LobbyUpdate;
+
 		StateHasChanged();
 	}
+
+	protected override void OnParametersSet() => actions?.Update();
 
 	private async Task LobbyUpdate(Lobby l)
 	{

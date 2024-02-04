@@ -62,6 +62,8 @@
 	public Game Game { get; set; } = null!;
 	public IReadOnlyList<RoadToBuild> RoadsToBuild => roadsToBuild;
 	public IReadOnlyList<ColonyToBuild> ColoniesToBuild => coloniesToBuild;
+	[Parameter]
+	public EventCallback UpdatedCallback { get; set; }
 	private List<RoadToBuild> roadsToBuild = [];
 	private List<ColonyToBuild> coloniesToBuild = [];
 
@@ -79,7 +81,7 @@
 		return Game.Map.GetPlanet(x, y).Owner >= 1 || coloniesToBuild.Contains(new(x, y));
 	}
 
-	private void ClickPlanet(int x, int y)
+	private async Task ClickPlanet(int x, int y)
 	{
 		ColonyToBuild c = new(x, y);
 		if (coloniesToBuild.Contains(c))
@@ -90,6 +92,7 @@
 		{
 			coloniesToBuild.Add(c);
 		}
+		await UpdatedCallback.InvokeAsync();
 	}
 
 	private bool ShowBuildIndicator(int x, int y, Direction direction)
@@ -107,7 +110,7 @@
 	private string GetRoadColor(int x, int y, Direction dir, int? id) =>
 		roadsToBuild.Contains(new(x, y, dir)) ? "white" : GetPlayerColor(id);
 
-	private void ClickRoad(int x, int y, Direction direction, bool onlyRemove = false)
+	private async Task ClickRoad(int x, int y, Direction direction, bool onlyRemove = false)
 	{
 		if (onlyRemove && ShowBuildIndicator(x, y, direction))
 		{
@@ -119,14 +122,14 @@
 			roadsToBuild.Remove(r);
 			roadsToBuild.Remove(r.Opposite());
 			coloniesToBuild.RemoveAll(c => !Game.Map.CanBuildColonyAt(c.X, c.Y, Game.CurrentPlayer, roadsToBuild));
-			Game.Map.RemoveDisjointRoads(Game.CurrentPlayer, roadsToBuild);
+			Game.Map.RemoveDisjointRoads(Game.CurrentPlayer, roadsToBuild, coloniesToBuild);
 		}
 		else if (!onlyRemove)
 		{
 			roadsToBuild.Add(r);
 			roadsToBuild.Add(r.Opposite());
 		}
-		StateHasChanged();
+		await UpdatedCallback.InvokeAsync();
 	}
 
 	private string GetRoadCursor(int x, int y, Direction direction)

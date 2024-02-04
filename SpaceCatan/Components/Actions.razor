@@ -1,10 +1,20 @@
 ﻿<div class="container">
 	<div class="actions">
 		<p>Buy Chaos Cards</p>
-		<NumberPicker @ref="@Picker" />
+		<NumberPicker @ref="@Picker" Updated="Update" />
 		<p class="help">1 Chaos Card = 1 Cobalt + 1 Food + 1 Water</p>
-	</div>
-	<button class="button is-success" disabled="@(!IsValidTurn)">End Turn</button>
+        <hr />
+        <ul>
+            @foreach (var (k, v) in cost)
+            {
+                if (v > 0)
+                {
+                    <li>@v @(FormatName(k.ToString()))</li>
+                }
+            }
+        </ul>
+    </div>
+	<button class="button is-success" disabled="@(!IsValidTurn)" @onclick="OnEndTurn">End Turn</button>
 	@if (!IsValidTurn)
 	{
 		<p class="help is-danger">Not enough resources!</p>
@@ -13,12 +23,88 @@
 
 
 @code {
-	[Parameter]
-	public int PlayerID { get; set; }
-	[Parameter]
-	public Game Game { get; set; } = new();
-	[Parameter]
-	public bool IsValidTurn { get; set; } = false;
-	public int DevelopmentCardsToBuy => Picker?.Count ?? 0;
-	private NumberPicker Picker { get; set; } = null!;
+    [Parameter]
+    public int PlayerID { get; set; }
+    [Parameter]
+    public Lobby Lobby { get; set; } = new();
+    [Parameter]
+    public User User { get; set; } = new();
+    [Parameter]
+    public bool IsValidTurn { get; set; } = false;
+    [Parameter]
+    public IReadOnlyList<RoadToBuild> RoadsToBuildRaw { get; set; } = Array.Empty<RoadToBuild>();
+    [Parameter]
+    public IReadOnlyList<ColonyToBuild> ColoniesToBuild { get; set; } = Array.Empty<ColonyToBuild>();
+    public int DevelopmentCardsToBuy => Picker?.Count ?? 0;
+    private NumberPicker Picker { get; set; } = null!;
+    private Dictionary<Resource, int> cost = [];
+    private List<RoadToBuild> roadsToBuild = [];
+
+    protected override void OnParametersSet()
+    {
+        cost = new()
+        {
+            [Resource.GRAVITRONIUM] = 0,
+            [Resource.COBALT] = 0,
+            [Resource.OXYGEN] = 0,
+            [Resource.FOOD] = 0,
+            [Resource.WATER] = 0,
+        };
+
+        cost[Resource.COBALT] += DevelopmentCardsToBuy;
+        cost[Resource.FOOD] += DevelopmentCardsToBuy;
+        cost[Resource.WATER] += DevelopmentCardsToBuy;
+
+        roadsToBuild.Clear();
+        foreach (var rtb in RoadsToBuildRaw ?? Array.Empty<RoadToBuild>())
+        {
+            if (!roadsToBuild.Contains(rtb.Opposite()))
+            {
+                roadsToBuild.Add(rtb);
+            }
+        }
+
+        cost[Resource.GRAVITRONIUM] += roadsToBuild.Count;
+        cost[Resource.COBALT] += roadsToBuild.Count;
+
+        cost[Resource.GRAVITRONIUM] += ColoniesToBuild?.Count ?? 0;
+        cost[Resource.OXYGEN] += ColoniesToBuild?.Count ?? 0;
+        cost[Resource.FOOD] += ColoniesToBuild?.Count ?? 0;
+
+        Player p = PlayerID is < 1 or > 4 ? default : Lobby.Game.Players[PlayerID - 1];
+
+        IsValidTurn = true;
+        IsValidTurn &= p.Gravitronium >= cost[Resource.GRAVITRONIUM];
+        IsValidTurn &= p.Cobalt >= cost[Resource.COBALT];
+        IsValidTurn &= p.Oxygen >= cost[Resource.OXYGEN];
+        IsValidTurn &= p.Food >= cost[Resource.FOOD];
+        IsValidTurn &= p.Water >= cost[Resource.WATER];
+    }
+
+    private async Task OnEndTurn()
+    {
+        if (!IsValidTurn)
+        {
+            return;
+        }
+
+        await Lobby.PlayTurn(User, new(roadsToBuild.ToArray(), ColoniesToBuild.ToArray(), [], DevelopmentCardsToBuy, false));
+    }
+
+    public void Update()
+    {
+        OnParametersSet();
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private static string FormatName(ReadOnlySpan<char> chars)
+    {
+        Span<char> s = stackalloc char[chars.Length];
+        chars.CopyTo(s);
+        for (int i = 1; i < s.Length; i++)
+        {
+            s[i] = char.ToLower(s[i]);
+        }
+        return new(s);
+    }
 }
