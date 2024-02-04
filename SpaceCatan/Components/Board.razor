@@ -11,10 +11,10 @@
 						int xCopy = x;
 						int yCopy = y;
 					}
-					<line style="cursor: pointer;" x1="50%" y1="50%" x2="50%" y2="0%" stroke-width="5%" stroke="@GetRoadColor(x, y, Direction.UP, roads.Up)" @onclick="() => ClickRoad(xCopy, yCopy, Direction.UP)" />
-					<line style="cursor: pointer;" x1="50%" y1="50%" x2="50%" y2="100%" stroke-width="5%" stroke="@GetRoadColor(x, y, Direction.DOWN, roads.Down)" @onclick="() => ClickRoad(xCopy, yCopy, Direction.DOWN)" />
-					<line style="cursor: pointer;" x1="50%" y1="50%" x2="0%" y2="50%" stroke-width="5%" stroke="@GetRoadColor(x, y, Direction.LEFT, roads.Left)" @onclick="() => ClickRoad(xCopy, yCopy, Direction.LEFT)" />
-					<line style="cursor: pointer;" x1="50%" y1="50%" x2="100%" y2="50%" stroke-width="5%" stroke="@GetRoadColor(x, y, Direction.RIGHT, roads.Right)" @onclick="() => ClickRoad(xCopy, yCopy, Direction.RIGHT)" />
+					<line style="cursor: @GetRoadCursor(xCopy, yCopy, Direction.UP);" x1="50%" y1="50%" x2="50%" y2="0%" stroke-width="5%" stroke="@GetRoadColor(x, y, Direction.UP, roads.Up)" @onclick="() => ClickRoad(xCopy, yCopy, Direction.UP, true)" />
+					<line style="cursor: @GetRoadCursor(xCopy, yCopy, Direction.DOWN);" x1="50%" y1="50%" x2="50%" y2="100%" stroke-width="5%" stroke="@GetRoadColor(x, y, Direction.DOWN, roads.Down)" @onclick="() => ClickRoad(xCopy, yCopy, Direction.DOWN, true)" />
+					<line style="cursor: @GetRoadCursor(xCopy, yCopy, Direction.LEFT);" x1="50%" y1="50%" x2="0%" y2="50%" stroke-width="5%" stroke="@GetRoadColor(x, y, Direction.LEFT, roads.Left)" @onclick="() => ClickRoad(xCopy, yCopy, Direction.LEFT, true)" />
+					<line style="cursor: @GetRoadCursor(xCopy, yCopy, Direction.RIGHT);" x1="50%" y1="50%" x2="100%" y2="50%" stroke-width="5%" stroke="@GetRoadColor(x, y, Direction.RIGHT, roads.Right)" @onclick="() => ClickRoad(xCopy, yCopy, Direction.RIGHT, true)" />
 					@if (p.Owner >= 1)
 					{
 						<image style="filter: @GetColorFilter(p.Owner);" x="38.5%" y="5%" width="25%" height="25%" href="/img/VerySuperCoolColony.png" />
@@ -72,7 +72,7 @@
 
 	}
 
-	private void ClickRoad(int x, int y, Direction direction)
+	private void ClickRoad(int x, int y, Direction direction, bool onlyRemove = false)
 	{
 		RoadToBuild r = new(x, y, direction);
 		if (roadsToBuild.Contains(r))
@@ -80,12 +80,17 @@
 			roadsToBuild.Remove(r);
 			roadsToBuild.Remove(r.Opposite());
 		}
-		else
+		else if (!onlyRemove)
 		{
 			roadsToBuild.Add(r);
 			roadsToBuild.Add(r.Opposite());
 		}
 		StateHasChanged();
+	}
+
+	private string GetRoadCursor(int x, int y, Direction direction)
+	{
+		return roadsToBuild.Contains(new(x, y, direction)) ? "pointer" : "unset";
 	}
 
 	private static string GetPlanetImage(PlanetKind kind) => kind switch
