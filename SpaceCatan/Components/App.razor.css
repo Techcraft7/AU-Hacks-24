@@ -4,10 +4,11 @@
 
 .bg {
 	background-image: url("/img/Background.png");
+	background-size: cover;
 	filter: brightness(50%);
 	width: 110vw;
 	height: 110vh;
-	position: absolute;
+	position: fixed;
 	left: calc(-5vw);
 	top: calc(-5vh);
 	z-index: -9999;
