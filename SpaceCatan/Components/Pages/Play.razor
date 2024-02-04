@@ -43,8 +43,6 @@
 		var auth = await AuthenticationStateTask;
 		string userID = auth.User.FindFirst("id")?.Value ?? string.Empty;
 
-		return;
-
 		var (user, error) = await UserStore.GetUser(userID, default);
 		if (error is not null)
 		{
@@ -58,5 +56,13 @@
 			NavManager.NavigateTo("/");
 			return;
 		}
+
+		Lobby.LobbyUpdated += LobbyUpdate;
+	}
+
+	private Task LobbyUpdate(Lobby l)
+	{
+		Lobby = l;
+		return Task.CompletedTask;
 	}
 }
