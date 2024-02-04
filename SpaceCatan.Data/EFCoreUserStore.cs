@@ -27,6 +27,7 @@ public sealed class EFCoreUserStore(SpaceCatanContext context) : IUserStore
 		try
 		{
 			await context.Users.AddAsync(user, cancellationToken);
+			await context.SaveChangesAsync(cancellationToken);
 			return (user, null);
 		}
 		catch (Exception e)
