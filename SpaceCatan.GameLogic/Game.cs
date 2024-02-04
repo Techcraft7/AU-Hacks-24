@@ -79,6 +79,10 @@ public sealed class Game
 			Map.SetPlanetOwner(c.X, c.Y, playerID);
 		}
 
+		if (turn.DevelopmentCardUsed)
+		{
+			p.DevelopmentCards -= 1;
+		}
 		// TODO: apply development cards
 
 		Players[playerID - 1] = p;
