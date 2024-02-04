@@ -1,0 +1,71 @@
+﻿@page "/"
+
+<section class="section">
+	<div class="container">
+		<div class="columns">
+			<div class="column is-hidden-mobile"></div>
+			<div class="column is-two-thirds box has-background-dark has-text-light">
+				<div class="has-text-centered mb-5">
+					<p class="title is-1 has-text-light">Cosmic Colonies</p>
+				</div>
+				<div class="has-text-centered">
+					<p class="subtitle has-text-light">Conquer The Cosmos and Build Your Empire</p>
+					<a class="button is-link is-large" href="/howtoplay">See how to play</a>
+				</div>
+				<div style="cursor: default; pointer-events: none;">
+					<Board Game="@GenerateRandomGame()" PlayerID="-1" />
+				</div>
+			</div>
+			<div class="column"></div>
+		</div>
+	</div>
+</section>
+
+@code {
+	private static Game GenerateRandomGame()
+	{
+		Game game = new();
+		for (int i = 0; i < 4; i++)
+		{
+			int x, y;
+			do
+			{
+				x = Random.Shared.Next(5);
+				y = Random.Shared.Next(5);
+			}
+			while (game.Map.GetPlanet(x, y).Owner != 0);
+
+			Direction dir1 = 0;
+			do
+			{
+				dir1 = (Direction)Random.Shared.Next(4);
+			}
+			while ((x, y, dir1) switch
+			{
+				(0, _, Direction.LEFT) => true,
+				(4, _, Direction.RIGHT) => true,
+				(_, 0, Direction.UP) => true,
+				(_, 4, Direction.DOWN) => true,
+				_ => false
+			});
+			Direction dir2 = 0;
+			do
+			{
+				dir2 = (Direction)Random.Shared.Next(4);
+			}
+			while (dir2 == dir1 || (x, y, dir2) switch
+			{
+				(0, _, Direction.LEFT) => true,
+				(4, _, Direction.RIGHT) => true,
+				(_, 0, Direction.UP) => true,
+				(_, 4, Direction.DOWN) => true,
+				_ => false
+			});
+
+			game.Map.SetPlanetOwner(x, y, i + 1);
+			game.Map.SetRoad(x, y, dir1, i + 1);
+			game.Map.SetRoad(x, y, dir2, i + 1);
+		}
+		return game;
+	}
+}

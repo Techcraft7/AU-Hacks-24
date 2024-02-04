@@ -1,0 +1,191 @@
+﻿@page "/play"
+@implements IDisposable
+@attribute [Authorize]
+@inject IUserStore UserStore
+@inject ILogger<Play> Logger
+@inject NavigationManager NavManager
+@inject ILobbyStore LobbyStore
+@rendermode InteractiveServer
+
+<section class="section">
+	<div class="columns">
+		<div class="column box has-background-dark has-text-light">
+			@if (Lobby.Winner is int w)
+			{
+				<div class="has-text-centered">
+					<p>Player @w wins!</p>
+				</div>
+			}
+			else if (Lobby.HasStarted)
+			{
+				<div class="has-text-centered">
+					<p style="color: @Board.GetPlayerColor(PlayerID)">You are: Player @PlayerID</p>
+				</div>
+				<Resources PlayerID="@PlayerID" Game="@Lobby.Game" />
+			}
+			else
+			{
+				<p>Waiting for the game to start...</p>
+				<br />
+				<p>Your resource list will appear here when the game starts</p>
+			}
+		</div>
+		<div class="column is-three-fifths p-0">
+			<Board Game="@Lobby.Game" PlayerID="@PlayerID" @ref="@board" UpdatedCallback="() => actions?.Update()" />
+		</div>
+		<div class="column split">
+			<div class="log box has-background-dark has-text-light">
+				@if (Lobby.HasStarted)
+				{
+					if (Lobby.Winner is not null)
+					{
+						<p>Game is over!</p>
+					}
+					else if (Lobby.HasStarted && Lobby.Game.CurrentPlayer == PlayerID)
+					{
+						<Actions @ref="@actions" PlayerID="@PlayerID" User="@User" Lobby="@Lobby" RoadsToBuildRaw="@board?.RoadsToBuild" ColoniesToBuild="@board?.ColoniesToBuild" />
+					}
+					else if (Lobby.HasStarted)
+					{
+						<p>Waiting for your turn...</p>
+						<br />
+						<p>Current player: @Lobby.Game.CurrentPlayer</p>
+					}
+					else
+					{
+						<p>Waiting for the game to start...</p>
+						<br />
+						<p>
+							Your options for your turn will be configured here.
+						</p>
+						<br />
+						<p>
+							Build colonies by clicking on planets, and build Hyperbridges by clicking on the "V" shapes.
+						</p>
+					}
+				}
+				else
+				{
+					<p>Waiting for the game to start...</p>
+				}
+			</div>
+			<div class="bottom box has-background-dark has-text-light">
+				@foreach (string str in Lobby.Log.Reverse())
+				{
+					<p>@str</p>
+				}
+			</div>
+		</div>
+	</div>
+</section>
+
+<HeadContent>
+	<script src="_framework/blazor.web.js" autostart="false"></script>
+	<script>
+		Blazor.start({
+			ssr: { disableDomPreservation: true }
+		});
+	</script>
+</HeadContent>
+
+@code {
+	[CascadingParameter]
+	public Task<AuthenticationState> AuthenticationStateTask { get; set; } = null!;
+	private Lobby Lobby { get; set; } = new();
+	private string UserID { get; set; } = "";
+	private int PlayerID => Lobby.PlayerIDMap.GetValueOrDefault(UserID);
+	private Board board = null!;
+	private Actions actions = null!;
+	private User User { get; set; } = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		var auth = await AuthenticationStateTask;
+		UserID = auth.User.FindFirst("id")?.Value ?? string.Empty;
+
+		var (user, error) = await UserStore.GetUser(UserID, default);
+		if (error is not null)
+		{
+			Logger.LogError(error, "Failed to get user data");
+			NavManager.NavigateTo("/");
+			return;
+		}
+		if (user is null)
+		{
+			Logger.LogWarning("Non-existent user tried to join a game");
+			NavManager.NavigateTo("/");
+			return;
+		}
+		User = user;
+
+		if (user.CurrentLobby is null)
+		{
+			do
+			{
+				(Lobby, error) = await LobbyStore.GetJoinableLobby(default);
+				if (error is not null)
+				{
+					Logger.LogError(error, "Failed to get lobby");
+					NavManager.NavigateTo("/");
+					return;
+				}
+
+				user.CurrentLobby = Lobby.ID;
+				error = await UserStore.UpdateUser(user, default);
+				if (error is not null)
+				{
+					Logger.LogError(error, "Failed to assign user to lobby");
+					NavManager.NavigateTo("/");
+					return;
+				}
+
+			} while (!await Lobby.TryAddPlayer(user));
+		}
+		else
+		{
+			(Lobby? l, error) = await LobbyStore.GetLobby(user.CurrentLobby.Value, default);
+			if (error is not null)
+			{
+				Logger.LogError(error, "Failed to get lobby");
+				NavManager.NavigateTo("/");
+				return;
+			}
+			if (l is null)
+			{
+				user.CurrentLobby = null;
+				await UserStore.UpdateUser(user, default);
+				NavManager.NavigateTo("/play");
+				return;
+			}
+			Lobby = l;
+		}
+
+		// #if DEBUG
+		// 	Logger.LogInformation($"Put user {user.ID} in lobby {Lobby.ID}");
+		// #endif
+
+		Lobby.LobbyUpdated += LobbyUpdate;
+
+		StateHasChanged();
+	}
+
+	protected override void OnParametersSet() => actions?.Update();
+
+	private async Task LobbyUpdate(Lobby l)
+	{
+		Lobby = l;
+		await InvokeAsync(async () =>
+		{
+			board?.ClearSelection();
+			if (Lobby.Winner is not null)
+			{
+				User.Wins += Lobby.Winner == Lobby.PlayerIDMap.GetValueOrDefault(User.ID) ? 1 : 0;
+				User.CurrentLobby = null;
+				await UserStore.UpdateUser(User, default);
+			}
+			StateHasChanged();
+		});
+	}
+
+	public void Dispose() => Lobby.LobbyUpdated -= LobbyUpdate;
+}

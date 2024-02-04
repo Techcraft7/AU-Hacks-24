@@ -1,0 +1,25 @@
+﻿.tile img {
+	height: 100px;
+}
+
+div.tile {
+	display: flex;
+}
+
+article {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+strong {
+	color: unset;
+}
+
+.small {
+	height: 100px;
+}
+
+.border article {
+	min-height: 100px;
+}

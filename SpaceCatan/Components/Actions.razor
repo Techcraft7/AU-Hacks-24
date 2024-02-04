@@ -1,0 +1,227 @@
+﻿<Exchanger Rate="Lobby.Game.Map.HasOutpost(PlayerID) ? 2 : 4" @ref="exchanger" OnClose="Update" />
+
+<div class="container">
+	<div class="actions">
+        @if (!Lobby.Game.IsInSetup)
+        {
+            <p class="mb-2">Buy Chaos Cards</p>
+            <NumberPicker @ref="@Picker" Updated="Update" />
+            <p class="help">1 Chaos Card = 1 Cobalt + 1 Food + 1 Water</p>
+            <label class="checkbox has-text-light mt-3">
+                <input type="checkbox" @bind-value="@UseDevCard" />
+                Use a Chaos Card?
+            </label>
+            <hr />
+        }
+        @if (Lobby.Game.IsInSetup)
+        {
+            <div class="has-text-centered mb-3">
+                <p class="title is-4 has-text-light">Setup Phase</p>
+            </div>
+            <p>Place one Colony and one adjacent Hyperbridge</p>
+            <br />
+            <p>
+                You cannot place your first Colony on an outpost or an empty planet
+            </p>
+            <br />
+            <p>
+                Click a planet to place a Colony, then click one of the "V" shapes to build a Hyperbridge
+            </p>
+        }
+        else if (resourceDeltas.Values.All(x => x == 0))
+        {
+            <p>Current actions would use no resources</p>
+        }
+        else
+        {
+            <ul>
+                @foreach (var (k, v) in resourceDeltas)
+                {
+                    if (v != 0)
+                    {
+                        <li>@(v > 0 ? "+" : "")@v @(FormatName(k.ToString()))</li>
+                    }
+                }
+            </ul>
+        }
+        @if (!Lobby.Game.IsInSetup)
+        {
+            <hr />
+            <button class="button is-link is-fullwidth" @onclick="OpenExchanger">Exchange</button>
+        }
+    </div>
+    <button class="button is-success" disabled="@(!IsValidTurn)" @onclick="OnEndTurn">End Turn</button>
+    @if (!IsValidTurn)
+    {
+        @if (Lobby.Game.IsInSetup)
+        {
+            <p class="help is-danger">Please place one Colony and one Hyperbridge!</p>
+        }
+        else
+        {
+            <p class="help is-danger">Not enough resources!</p>
+        }
+    }
+</div>
+
+
+@code {
+    [Parameter]
+    public int PlayerID { get; set; }
+    [Parameter]
+    public Lobby Lobby { get; set; } = new();
+    [Parameter]
+    public User User { get; set; } = new();
+    [Parameter]
+    public bool IsValidTurn { get; set; } = false;
+    [Parameter]
+    public IReadOnlyList<RoadToBuild> RoadsToBuildRaw { get; set; } = Array.Empty<RoadToBuild>();
+    [Parameter]
+    public IReadOnlyList<ColonyToBuild> ColoniesToBuild { get; set; } = Array.Empty<ColonyToBuild>();
+    public int DevelopmentCardsToBuy => Picker?.Count ?? 0;
+    private NumberPicker Picker { get; set; } = null!;
+    private Dictionary<Resource, int> resourceDeltas = [];
+    private List<RoadToBuild> roadsToBuild = [];
+    private Exchanger exchanger = null!;
+    private bool UseDevCard
+    {
+        get => useDevCard;
+        set
+        {
+            useDevCard = value;
+            Update();
+        }
+    }
+    private bool useDevCard = false;
+
+    private void OpenExchanger()
+    {
+        exchanger.Show = true;
+        exchanger.Update();
+        StateHasChanged();
+    }
+
+    protected override void OnParametersSet()
+    {
+        ColoniesToBuild ??= Array.Empty<ColonyToBuild>();
+        RoadsToBuildRaw ??= Array.Empty<RoadToBuild>();
+
+        roadsToBuild.Clear();
+        foreach (var rtb in RoadsToBuildRaw ?? Array.Empty<RoadToBuild>())
+        {
+            if (!roadsToBuild.Contains(rtb.Opposite()))
+            {
+                roadsToBuild.Add(rtb);
+            }
+        }
+
+        if (Lobby.Game.IsInSetup)
+        {
+            IsValidTurn = true;
+            IsValidTurn &= ColoniesToBuild.Count == 1;
+            IsValidTurn &= roadsToBuild.Count == 1;
+
+            if (!IsValidTurn)
+            {
+                return;
+            }
+
+            var (x, y) = ColoniesToBuild.Single();
+            Planet planet = Lobby.Game.Map.GetPlanet(x, y);
+            IsValidTurn &= planet.Owner == 0;
+            IsValidTurn &= planet.Kind is not (PlanetKind.OUTPOST or PlanetKind.EMPTY);
+            return;
+        }
+
+        resourceDeltas = new()
+        {
+            [Resource.GRAVITRONIUM] = 0,
+            [Resource.COBALT] = 0,
+            [Resource.OXYGEN] = 0,
+            [Resource.FOOD] = 0,
+            [Resource.WATER] = 0,
+        };
+
+        PopulateResourceDictWithExchanges(resourceDeltas);
+
+        resourceDeltas[Resource.COBALT] -= DevelopmentCardsToBuy;
+        resourceDeltas[Resource.FOOD] -= DevelopmentCardsToBuy;
+        resourceDeltas[Resource.WATER] -= DevelopmentCardsToBuy;
+
+        resourceDeltas[Resource.GRAVITRONIUM] -= roadsToBuild.Count;
+        resourceDeltas[Resource.COBALT] -= roadsToBuild.Count;
+
+        resourceDeltas[Resource.GRAVITRONIUM] -= ColoniesToBuild?.Count ?? 0;
+        resourceDeltas[Resource.OXYGEN] -= ColoniesToBuild?.Count ?? 0;
+        resourceDeltas[Resource.FOOD] -= ColoniesToBuild?.Count ?? 0;
+
+        Player p = PlayerID is < 1 or > 4 ? default : Lobby.Game.Players[PlayerID - 1];
+
+        IsValidTurn = true;
+        IsValidTurn &= p.Gravitronium + resourceDeltas[Resource.GRAVITRONIUM] >= 0;
+        IsValidTurn &= p.Cobalt + resourceDeltas[Resource.COBALT] >= 0;
+        IsValidTurn &= p.Oxygen + resourceDeltas[Resource.OXYGEN] >= 0;
+        IsValidTurn &= p.Food + resourceDeltas[Resource.FOOD] >= 0;
+        IsValidTurn &= p.Water + resourceDeltas[Resource.WATER] >= 0;
+        if (useDevCard)
+        {
+            IsValidTurn &= p.DevelopmentCards > 0;
+        }
+    }
+
+    private async Task OnEndTurn()
+    {
+        if (!IsValidTurn)
+        {
+            return;
+        }
+
+        if (Lobby.Game.IsInSetup)
+        {
+            var (x, y) = ColoniesToBuild.Single();
+            var (_, _, dir) = roadsToBuild.Single();
+            await Lobby.PlaySetupTurn(User, new(x, y, dir));
+            return;
+        }
+
+        Dictionary<Resource, int> exhcanges = new()
+        {
+            [Resource.GRAVITRONIUM] = 0,
+            [Resource.COBALT] = 0,
+            [Resource.OXYGEN] = 0,
+            [Resource.FOOD] = 0,
+            [Resource.WATER] = 0,
+        };
+
+        PopulateResourceDictWithExchanges(exhcanges);
+
+        await Lobby.PlayTurn(User, new(roadsToBuild.ToArray(), ColoniesToBuild.ToArray(), exhcanges, DevelopmentCardsToBuy, useDevCard));
+    }
+
+    public void Update()
+    {
+        OnParametersSet();
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void PopulateResourceDictWithExchanges(Dictionary<Resource, int> d)
+    {
+        int exchangeRate = Lobby.Game.Map.HasOutpost(PlayerID) ? 2 : 4;
+        foreach (var step in exchanger?.Steps ?? Array.Empty<Exchanger.Step>())
+        {
+            d[step.Input] -= exchangeRate;
+            d[step.Output] += 1;
+        }
+    }
+
+    private static string FormatName(ReadOnlySpan<char> chars)
+    {
+        Span<char> s = stackalloc char[chars.Length];
+        chars.CopyTo(s);
+        for (int i = 1; i < s.Length; i++)
+        {
+            s[i] = char.ToLower(s[i]);
+        }
+        return new(s);
+    }
+}

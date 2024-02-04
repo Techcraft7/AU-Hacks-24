@@ -1,0 +1,23 @@
+﻿<div class="field has-addons">
+	<p class="control">
+		<button class="button" @onclick="() => Add(-1)">-</button>
+	</p>
+	<p class="control is-expanded">
+		<button class="button is-fullwidth">@Count</button>
+	</p>
+	<p class="control">
+		<button class="button" @onclick="() => Add(1)">+</button>
+	</p>
+</div>
+
+@code {
+	public int Count { get; set; }
+	[Parameter]
+	public EventCallback Updated { get; set; }
+
+	private async Task Add(int x)
+	{
+		Count = Math.Max(0, Count + x);
+		await Updated.InvokeAsync();
+	}
+}

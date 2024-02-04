@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SpaceCatan.Data\SpaceCatan.Data.csproj" />
     <ProjectReference Include="..\SpaceCatan.GameLogic\SpaceCatan.GameLogic.csproj" />
   </ItemGroup>
 

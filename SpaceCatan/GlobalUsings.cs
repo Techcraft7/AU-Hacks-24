@@ -1,2 +1,2 @@
-global using Xunit;
+﻿global using SpaceCatan.Data;
 global using SpaceCatan.GameLogic;

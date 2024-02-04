@@ -1,0 +1,10 @@
+﻿.container {
+	display: flex;
+	justify-content: flex-end;
+	flex-direction: column;
+	height: 100%;
+}
+
+.actions {
+	flex-grow: 1;
+}

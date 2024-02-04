@@ -1,0 +1,10 @@
+﻿.split {
+	display: grid;
+	grid-template-rows: 5fr 1fr;
+	grid-template-columns: repeat(1, 1fr);
+	height: 80vh;
+}
+
+.bottom {
+	overflow-y: scroll;
+}

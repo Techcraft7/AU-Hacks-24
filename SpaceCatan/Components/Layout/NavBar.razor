@@ -1,0 +1,64 @@
+﻿<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		const el = document.querySelector(".navbar-burger");
+		el.addEventListener('click', () => {
+			const target = el.dataset.target;
+			const $target = document.getElementById(target);
+			el.classList.toggle('is-active');
+			$target.classList.toggle('is-active');
+		});
+	});
+</script>
+<nav class="navbar is-fixed-top is-dark">
+	<div class="navbar-brand">
+		<a class="navbar-item" href="/">
+			<p class="title is-5 has-text-light">
+				Cosmic Colonies
+			</p>
+		</a>
+		<a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbar">
+			<span aria-hidden="true"></span>
+			<span aria-hidden="true"></span>
+			<span aria-hidden="true"></span>
+		</a>
+	</div>
+	<div id="navbar" class="navbar-menu has-background-grey-darker">
+		<div class="navbar-start">
+			<AuthorizeView>
+				<Authorized>
+					<div class="navbar-item">
+						<a class="has-text-light" href="/play">Join Game</a>
+					</div>
+				</Authorized>
+				<NotAuthorized>
+					<div class="navbar-item">
+						<a class="has-text-light" href="/login?redirectUri=/play">Join Game</a>
+					</div>
+				</NotAuthorized>
+			</AuthorizeView>
+			<div class="navbar-item">
+				<a class="has-text-light" href="/howtoplay">How to Play</a>
+			</div>
+		</div>
+		<div class="navbar-end">
+			<AuthorizeView>
+				<Authorized>
+					<div class="navbar-item">
+						<a class="has-text-light" href="/profile">@context.User.Identity?.Name</a>
+					</div>
+					<div class="navbar-item">
+						<a class="button is-danger" href="/logout?redirectTo=/">Logout</a>
+					</div>
+				</Authorized>
+				<NotAuthorized>
+					<div class="navbar-item">
+						<a class="button is-success" href="/signup">Signup</a>
+					</div>
+					<div class="navbar-item">
+						<a class="button" href="/login?redirectUri=/">Login</a>
+					</div>
+				</NotAuthorized>
+			</AuthorizeView>
+		</div>
+	</div>
+</nav>

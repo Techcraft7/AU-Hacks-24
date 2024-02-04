@@ -1,0 +1,18 @@
+﻿@media only screen and (max-width : 1024px) {
+	.navbar-menu.is-active {
+		border-bottom: 1px solid white;
+		border-top: 1px solid white;
+	}
+}
+
+.navbar-item:focus {
+	background-color: #292929 !important;
+}
+
+.navbar-dropdown > a:hover {
+	background-color: #292929 !important;
+}
+
+.has-dropdown > a:hover, .has-dropdown > a:focus {
+	background-color: #292929 !important;
+}

@@ -1,0 +1,218 @@
+﻿<div class="board">
+	@for (int y = 0; y < 5; y++)
+	{
+		@for (int x = 0; x < 5; x++)
+		{
+			Planet p = Game.Map.GetPlanet(x, y);
+			<div class="cell">
+				<svg viewBox="0 0 256 256" width="100%">
+					@{
+						var roads = Game.Map.GetRoads(x, y);
+						int xCopy = x;
+						int yCopy = y;
+					}
+					<line style="cursor: @GetRoadCursor(xCopy, yCopy, Direction.UP);" x1="50%" y1="50%" x2="50%" y2="0%" stroke-width="15%" stroke="@GetRoadColor(x, y, Direction.UP, roads.Up)" @onclick="() => ClickRoad(xCopy, yCopy, Direction.UP, true)" />
+					<line style="cursor: @GetRoadCursor(xCopy, yCopy, Direction.DOWN);" x1="50%" y1="50%" x2="50%" y2="100%" stroke-width="15%" stroke="@GetRoadColor(x, y, Direction.DOWN, roads.Down)" @onclick="() => ClickRoad(xCopy, yCopy, Direction.DOWN, true)" />
+					<line style="cursor: @GetRoadCursor(xCopy, yCopy, Direction.LEFT);" x1="50%" y1="50%" x2="0%" y2="50%" stroke-width="15%" stroke="@GetRoadColor(x, y, Direction.LEFT, roads.Left)" @onclick="() => ClickRoad(xCopy, yCopy, Direction.LEFT, true)" />
+					<line style="cursor: @GetRoadCursor(xCopy, yCopy, Direction.RIGHT);" x1="50%" y1="50%" x2="100%" y2="50%" stroke-width="15%" stroke="@GetRoadColor(x, y, Direction.RIGHT, roads.Right)" @onclick="() => ClickRoad(xCopy, yCopy, Direction.RIGHT, true)" />
+					@if (ShowColony(xCopy, yCopy))
+					{
+						<image style="filter: @GetColonyColor(xCopy, yCopy, p.Owner); pointer-events: none; transform: rotate(-45deg)" x="-5%" y="30%" width="25%" height="25%" href="/img/VerySuperCoolColony.png" />
+					}
+					<image style="cursor: @GetPlanetCursor(xCopy, yCopy);" href="@GetPlanetImage(p.Kind)" x="20%" y="20%" width="60%" height="60%" @onclick="() => ClickPlanet(xCopy, yCopy)" />
+					@if (p.Kind is not (PlanetKind.EMPTY or PlanetKind.OUTPOST))
+					{
+						<text>
+							<text style="pointer-events: none; user-select: none;" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" stroke="white" font-weight="bold" font-size="50px">@p.Number</text>
+						</text>
+					}
+
+					@if (ShowBuildIndicator(xCopy, yCopy, Direction.UP))
+					{
+						<text>
+							<text style="transform: scaleX(200%) rotate(180deg) translate(-25%, -10%); cursor: pointer; user-select: none;" dominant-baseline="middle" text-anchor="middle" stroke="white" fill="white" font-weight="bold" font-size="30px" @onclick="() => ClickRoad(xCopy, yCopy, Direction.UP)">V</text>
+						</text>
+					}
+					@if (ShowBuildIndicator(xCopy, yCopy, Direction.DOWN))
+					{
+						<text>
+							<text style="transform: scaleX(200%) rotate(0deg) translate(25%, 90%); cursor: pointer; user-select: none;" dominant-baseline="middle" text-anchor="middle" stroke="white" fill="white" font-weight="bold" font-size="30px" @onclick="() => ClickRoad(xCopy, yCopy, Direction.DOWN)">V</text>
+						</text>
+					}
+					@if (ShowBuildIndicator(xCopy, yCopy, Direction.LEFT))
+					{
+						<text>
+							<text style="transform: scaleY(200%) rotate(90deg) translate(25%, -10%); cursor: pointer; user-select: none;" dominant-baseline="middle" text-anchor="middle" stroke="white" fill="white" font-weight="bold" font-size="30px" @onclick="() => ClickRoad(xCopy, yCopy, Direction.LEFT)">V</text>
+						</text>
+					}
+					@if (ShowBuildIndicator(xCopy, yCopy, Direction.RIGHT))
+					{
+						<text>
+					<text style="transform: scaleY(200%) rotate(270deg) translate(-25%, 90%); cursor: pointer; user-select: none;" dominant-baseline="middle" text-anchor="middle" stroke="white" fill="white" font-weight="bold" font-size="30px" @onclick="() => ClickRoad(xCopy, yCopy, Direction.RIGHT)">V</text>
+						</text>
+					}
+				</svg>
+			</div>
+		}
+	}
+</div>
+
+@code {
+	[Parameter]
+	public Game Game { get; set; } = null!;
+	[Parameter]
+	public int PlayerID { get; set; }
+	public IReadOnlyList<RoadToBuild> RoadsToBuild => roadsToBuild;
+	public IReadOnlyList<ColonyToBuild> ColoniesToBuild => coloniesToBuild;
+	[Parameter]
+	public EventCallback UpdatedCallback { get; set; }
+	private List<RoadToBuild> roadsToBuild = [];
+	private List<ColonyToBuild> coloniesToBuild = [];
+
+	private string GetColonyColor(int x, int y, int? id)
+	{
+		if (coloniesToBuild.Contains(new(x, y)))
+		{
+			return "contrast(0) brightness(10000%)";
+		}
+		return GetColorFilter(id);
+	}
+
+	private string GetPlanetCursor(int x, int y)
+	{
+		if (Game.CurrentPlayer != PlayerID || !Game.Map.CanBuildColonyAt(x, y, PlayerID, roadsToBuild))
+		{
+			return "unset";
+		}
+		if (Game.IsInSetup)
+		{
+			return Game.Map.GetPlanet(x, y).Kind is not (PlanetKind.EMPTY or PlanetKind.OUTPOST)
+				? "pointer"
+				: "not-allowed";
+		}
+		return "pointer";
+	}
+
+	private bool ShowColony(int x, int y)
+	{
+		return Game.Map.GetPlanet(x, y).Owner >= 1 || coloniesToBuild.Contains(new(x, y));
+	}
+
+	private async Task ClickPlanet(int x, int y)
+	{
+		if (Game.CurrentPlayer != PlayerID)
+		{
+			return;
+		}
+		if (Game.IsInSetup && Game.Map.GetPlanet(x, y).Kind is not (PlanetKind.EMPTY or PlanetKind.OUTPOST))
+		{
+			coloniesToBuild.Clear();
+			coloniesToBuild.Add(new(x, y));
+			return;
+		}
+		ColonyToBuild c = new(x, y);
+		if (coloniesToBuild.Contains(c))
+		{
+			coloniesToBuild.Remove(c);
+		}
+		else if (Game.Map.CanBuildColonyAt(x, y, PlayerID, roadsToBuild))
+		{
+			coloniesToBuild.Add(c);
+		}
+		await UpdatedCallback.InvokeAsync();
+	}
+
+	private bool ShowBuildIndicator(int x, int y, Direction direction)
+	{
+		if (Game.CurrentPlayer != PlayerID)
+		{
+			return false;
+		}
+		if (RoadsToBuild.Contains(new(x, y, direction)))
+		{
+			return false;
+		}
+		if (Game.IsInSetup)
+		{
+			if (coloniesToBuild.Count < 1)
+			{
+				return false;
+			}
+			return coloniesToBuild.First() == new ColonyToBuild(x, y);
+		}
+		return (x, y, direction) switch
+		{
+			(0, _, Direction.LEFT) => false,
+			(4, _, Direction.RIGHT) => false,
+			(_, 0, Direction.UP) => false,
+			(_, 4, Direction.DOWN) => false,
+			_ => Game.Map.CanBuildRoadAt(x, y, direction, PlayerID, RoadsToBuild)
+		};
+	}
+
+	private string GetRoadColor(int x, int y, Direction dir, int? id) =>
+		roadsToBuild.Contains(new(x, y, dir)) ? "white" : GetPlayerColor(id);
+
+	private async Task ClickRoad(int x, int y, Direction direction, bool onlyRemove = false)
+	{
+		if (onlyRemove && ShowBuildIndicator(x, y, direction))
+		{
+			return;
+		}
+		RoadToBuild r = new(x, y, direction);
+		if (roadsToBuild.Contains(r))
+		{
+			roadsToBuild.Remove(r);
+			roadsToBuild.Remove(r.Opposite());
+			coloniesToBuild.RemoveAll(c => !Game.Map.CanBuildColonyAt(c.X, c.Y, PlayerID, roadsToBuild));
+			Game.Map.RemoveDisjointRoads(PlayerID, roadsToBuild, coloniesToBuild);
+		}
+		else if (!onlyRemove)
+		{
+			roadsToBuild.Add(r);
+			roadsToBuild.Add(r.Opposite());
+		}
+		await UpdatedCallback.InvokeAsync();
+	}
+
+	private string GetRoadCursor(int x, int y, Direction direction)
+	{
+		return roadsToBuild.Contains(new(x, y, direction)) ? "pointer" : "unset";
+	}
+
+	private static string GetPlanetImage(PlanetKind kind) => kind switch
+	{
+		PlanetKind.GRAVITRONIUM => "/img/GravitroniumPlanet.png",
+		PlanetKind.COBALT => "/img/CobaltPlanet.png",
+		PlanetKind.OXYGEN => "/img/OxygenPlanet.png",
+		PlanetKind.FOOD => "/img/FoodPlanet.png",
+		PlanetKind.WATER => "/img/WaterPlanet.png",
+		PlanetKind.OUTPOST => "/img/Outpost.png",
+		PlanetKind.EMPTY => "/img/EmptyPlanet.png",
+		_ => ""
+	};
+
+	public static string GetPlayerColor(int? id) => id switch
+	{
+		1 => "red",
+		2 => "blue",
+		3 => "yellow",
+		4 => "lime",
+		_ => "transparent"
+	};
+
+	private static string GetColorFilter(int? id) => id switch
+	{
+		1 => "invert(15%) sepia(87%) saturate(5409%) hue-rotate(4deg) brightness(105%) contrast(126%)",
+		2 => "invert(8%) sepia(100%) saturate(6217%) hue-rotate(246deg) brightness(109%) contrast(144%)",
+		3 => "brightness(0) saturate(100%) invert(94%) sepia(40%) saturate(2364%) hue-rotate(358deg) brightness(109%) contrast(103%)",
+		4 => "brightness(0) saturate(100%) invert(64%) sepia(33%) saturate(6491%) hue-rotate(81deg) brightness(115%) contrast(126%)",
+		_ => ""
+	};
+
+	public void ClearSelection()
+	{
+		roadsToBuild.Clear();
+		coloniesToBuild.Clear();
+	}
+}

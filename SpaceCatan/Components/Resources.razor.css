@@ -1,0 +1,26 @@
+﻿.list {
+	padding-top: 1rem;
+	padding-bottom: 1rem;
+	display: grid;
+	grid-template-rows: 1fr;
+}
+
+.list img {
+	max-height: calc(11vh - 10px);
+	margin: 5px;
+}
+
+.list p {
+	display: inline;
+	margin: auto;
+	min-width: 25px;
+}
+
+.list div {
+	margin: auto;
+	display: flex;
+}
+
+.columns.is-mobile p {
+	text-align: center;
+}

@@ -1,0 +1,106 @@
+﻿<div class="modal @(Show ? "is-active" : string.Empty)">
+	<div class="modal-background" @onclick="Close"></div>
+	<div class="modal-content box has-background-dark has-text-light">
+		<div class="has-text-centered mb-5">
+			<p class="title has-text-light">
+				Exchange
+			</p>
+		</div>
+		<hr />
+		<div class="has-text-centered">
+			<p>Here you can exchange resources for other resources.</p>
+			<br />
+			<p>
+				Resources will be exchanged in the order you setup below. <br />
+				Click on the resource card to cycle through all options
+			</p>
+			<br />
+			<div class="columns is-mobile mx-3">
+				<div class="column">
+					<button class="button is-danger is-fullwidth" @onclick="RemoveLast">Remove Step</button>
+				</div>
+				<div class="column">
+					<button class="button is-success is-fullwidth" @onclick="() => steps.Add(new())">Add Step</button>
+				</div>
+			</div>
+		</div>
+		<hr />
+		@for (int i = 0; i < steps.Count; i++)
+		{
+			Step s = steps[i];
+			int iCopy = i;
+			<ExchangeStep Rate="@Rate" Input="@s.Input" Output="@s.Output" CycleInput="() => CycleInput(iCopy)" CycleOutput="() => CycleOutput(iCopy)" />
+		}
+		<div class="mx-5">
+			<button class="button is-link is-fullwidth" @onclick="Close">Done</button>
+		</div>
+	</div>
+	<button class="modal-close is-large" aria-label="close" @onclick="Close"></button>
+</div>
+
+@code {
+	[Parameter]
+	public int Rate { get; set; } = 4;
+	[Parameter]
+	public EventCallback OnClose { get; set; }
+	public bool Show { get; set; }
+	public IReadOnlyList<Step> Steps => steps;
+	private readonly List<Step> steps = [];
+
+	public void Update() => StateHasChanged();
+
+	private void RemoveLast()
+	{
+		if (steps.Count > 0)
+		{
+			steps.RemoveAt(steps.Count - 1);
+		}
+	}
+
+	public async Task Close()
+	{
+		Show = false;
+		await OnClose.InvokeAsync();
+	}
+
+    public class Step
+    {
+		public Resource Input { get; set; } = Resource.GRAVITRONIUM;
+		public Resource Output { get; set; } = Resource.COBALT;
+	}
+
+	private void CycleInput(int i)
+	{
+		if (i < 0 || i >= steps.Count)
+		{
+			return;
+		}
+		steps[i].Input = CycleResource(steps[i].Input);
+		if (steps[i].Input == steps[i].Output)
+		{
+			CycleInput(i);
+		}
+	}
+
+	private void CycleOutput(int i)
+	{
+		if (i < 0 || i >= steps.Count)
+		{
+			return;
+		}
+		steps[i].Output = CycleResource(steps[i].Output);
+		if (steps[i].Output == steps[i].Input)
+		{
+			CycleOutput(i);
+		}
+	}
+
+	private static Resource CycleResource(Resource r) => r switch
+	{
+		Resource.GRAVITRONIUM => Resource.COBALT,
+		Resource.COBALT => Resource.OXYGEN,
+		Resource.OXYGEN => Resource.FOOD,
+		Resource.FOOD => Resource.WATER,
+		_ => Resource.GRAVITRONIUM,
+	};
+}
