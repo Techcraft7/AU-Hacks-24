@@ -17,7 +17,7 @@
             <ul>
                 @foreach (var (k, v) in resourceDeltas)
                 {
-                    if (v > 0)
+                    if (v != 0)
                     {
                         <li>@v @(FormatName(k.ToString()))</li>
                     }
@@ -25,6 +25,7 @@
             </ul>
         }
         <hr />
+        <button class="button is-link is-fullwidth" @onclick="() => {}">Exchange</button>
     </div>
 	<button class="button is-success" disabled="@(!IsValidTurn)" @onclick="OnEndTurn">End Turn</button>
 	@if (!IsValidTurn)
