@@ -16,6 +16,7 @@
 
 .list div {
 	margin: auto;
+	display: flex;
 }
 
 .columns.is-mobile p {
