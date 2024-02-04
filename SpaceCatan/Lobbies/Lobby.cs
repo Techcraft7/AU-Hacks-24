@@ -7,6 +7,7 @@ public sealed class Lobby
 	public bool HasStarted { get; private set; }
 	public int? Winner { get; private set; }
 	public Game Game { get; private set; } = new();
+	private bool onEndRun = false;
 	public IReadOnlyList<string> Log => log;
 	public event Func<Lobby, Task>? LobbyUpdated;
 	private readonly SemaphoreSlim semaphore = new(1);
@@ -50,6 +51,7 @@ public sealed class Lobby
 		if (HasStarted)
 		{
 			LeftPlayers[user.ID] = true;
+			semaphore.Release();
 			if (Game.CurrentPlayer == PlayerIDMap.GetValueOrDefault(user.ID))
 			{
 				await PlayBotMove(user.ID);
@@ -57,13 +59,17 @@ public sealed class Lobby
 			return;
 		}
 		PlayerIDMap.Remove(user.ID);
-		log.Add($"Waiting... {PlayerIDMap.Count}/4");
+		log.Add($"Waiting: {PlayerIDMap.Count}/4");
 		semaphore.Release();
 		await Update();
 	}
 
 	private async Task PlayBotMove(string userID)
 	{
+		if (LeftPlayers.Values.All(x => x))
+		{
+			return;
+		}
 		if (Game.IsInSetup)
 		{
 			int x, y;
@@ -139,7 +145,11 @@ public sealed class Lobby
 			{
 				log.Add($"Player {winner} wins!");
 				Winner = winner;
-				await (OnGameEnd?.Invoke(this) ?? Task.CompletedTask);
+				if (!onEndRun)
+				{
+					onEndRun = true;
+					await (OnGameEnd?.Invoke(this) ?? Task.CompletedTask);
+				}
 			}
 		}
 		semaphore.Release();
@@ -158,7 +168,11 @@ public sealed class Lobby
 		if (HasStarted && LeftPlayers.Values.All(x => x))
 		{
 			Winner = 0;
-			await (OnGameEnd?.Invoke(this) ?? Task.CompletedTask);
+			if (!onEndRun)
+			{
+				onEndRun = true;
+				await (OnGameEnd?.Invoke(this) ?? Task.CompletedTask);
+			}
 		}
 	}
 

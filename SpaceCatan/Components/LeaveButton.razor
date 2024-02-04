@@ -1,0 +1,47 @@
+﻿@rendermode InteractiveServer
+@inject IUserStore UserStore
+@inject ILobbyStore LobbyStore
+@inject NavigationManager NavManager
+@inject ILogger<LeaveButton> Logger
+
+<div class="has-text-centered" style="position: fixed; top: 1rem; left: 50%;">
+	<button class="button is-danger" @onclick="@Leave">Leave Game</button>
+</div>
+
+@code {
+	[CascadingParameter]
+	public Task<AuthenticationState> AuthenticationStateTask { get; set; } = null!;
+
+	private async Task Leave()
+	{
+		var auth = await AuthenticationStateTask;
+		string userID = auth.User.FindFirst("id")?.Value ?? string.Empty;
+
+		var (user, error) = await UserStore.GetUser(userID, default);
+		if (error is not null)
+		{
+			Logger.LogError(error, "Failed to get user data");
+			NavManager.NavigateTo("/");
+			return;
+		}
+		if (user is null)
+		{
+			Logger.LogWarning("Non-existent user tried to leave a game");
+			NavManager.NavigateTo("/");
+			return;
+		}
+
+		(Lobby? l, error) = await LobbyStore.GetLobby(user.CurrentLobby ?? default, default);
+		if (l is null)
+		{
+			Logger.LogWarning("User tried to leave a non-existent game");
+			NavManager.NavigateTo("/");
+			return;
+		}
+
+		await l.LeaveAsync(user);
+		user.CurrentLobby = null;
+		_ = await UserStore.UpdateUser(user, default);
+		NavManager.NavigateTo("/");
+	}
+}
