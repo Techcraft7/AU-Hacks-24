@@ -1,9 +1,25 @@
-﻿<nav class="navbar is-fixed-top is-dark">
+﻿<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		const el = document.querySelector(".navbar-burger");
+		el.addEventListener('click', () => {
+			const target = el.dataset.target;
+			const $target = document.getElementById(target);
+			el.classList.toggle('is-active');
+			$target.classList.toggle('is-active');
+		});
+	});
+</script>
+<nav class="navbar is-fixed-top is-dark">
 	<div class="navbar-brand">
 		<a class="navbar-item" href="/">
 			<p class="title is-5 has-text-light">
 				Cosmic Colonies
 			</p>
+		</a>
+		<a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbar">
+			<span aria-hidden="true"></span>
+			<span aria-hidden="true"></span>
+			<span aria-hidden="true"></span>
 		</a>
 	</div>
 	<div id="navbar" class="navbar-menu has-background-grey-darker">
