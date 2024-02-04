@@ -6,7 +6,7 @@ namespace SpaceCatan.GameLogic;
 
 public static class RoadFollower
 {
-	public static void RemoveDisjointRoads(this Map map, int player, IList<RoadToBuild> list)
+	public static void RemoveDisjointRoads(this Map map, int player, IList<RoadToBuild> list, IList<ColonyToBuild> list2)
 	{
 		HashSet<(int, int)> visited = [];
 		ReadOnlySpan<Direction> allDirs = [Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT];
@@ -47,7 +47,14 @@ public static class RoadFollower
 				list.RemoveAt(i);
 			}
 		}
-	}
+        for (int i = list2.Count - 1; i >= 0; i--)
+        {
+            if (!visited.Contains((list2[i].X, list2[i].Y)))
+            {
+                list2.RemoveAt(i);
+            }
+        }
+    }
 
 	private static void Visit(Map m, int x, int y, int player, HashSet<(int, int)> visited)
 	{
