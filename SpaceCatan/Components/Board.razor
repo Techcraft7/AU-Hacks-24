@@ -9,10 +9,10 @@
 					@{
 						var roads = Map.GetRoads(x, y);
 					}
-					<line x1="50%" y1="50%" x2="50%" y2="0%" stroke-width="5%" stroke="@GetPlayerColor(roads.Up)" />
-					<line x1="50%" y1="50%" x2="50%" y2="100%" stroke-width="5%" stroke="@GetPlayerColor(roads.Down)" />
-					<line x1="50%" y1="50%" x2="0%" y2="50%" stroke-width="5%" stroke="@GetPlayerColor(roads.Left)" />
-					<line x1="50%" y1="50%" x2="100%" y2="50%" stroke-width="5%" stroke="@GetPlayerColor(roads.Right)" />
+					<line x1="50%" y1="50%" x2="50%" y2="0%" stroke-width="5%" stroke="@GetRoadColor(x, y, Direction.UP, roads.Up)" />
+					<line x1="50%" y1="50%" x2="50%" y2="100%" stroke-width="5%" stroke="@GetRoadColor(x, y, Direction.DOWN, roads.Down)" />
+					<line x1="50%" y1="50%" x2="0%" y2="50%" stroke-width="5%" stroke="@GetRoadColor(x, y, Direction.LEFT, roads.Left)" />
+					<line x1="50%" y1="50%" x2="100%" y2="50%" stroke-width="5%" stroke="@GetRoadColor(x, y, Direction.RIGHT, roads.Right)" />
 					@if (p.Owner >= 1)
 					{
 						<image style="filter: @GetColorFilter(p.Owner);" x="38.5%" y="5%" width="25%" height="25%" href="/img/VerySuperCoolColony.png" />
@@ -33,6 +33,10 @@
 @code {
 	[Parameter]
 	public Map Map { get; set; } = null!;
+	private List<RoadToBuild> RoadsToBuild { get; set; } = [];
+
+	private string GetRoadColor(int x, int y, Direction dir, int? id) =>
+		RoadsToBuild.Contains(new(x, y, dir)) ? "white" : GetPlayerColor(id);
 
 	private static string GetPlanetImage(PlanetKind kind) => kind switch
 	{
