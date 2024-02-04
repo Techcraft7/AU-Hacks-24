@@ -18,11 +18,6 @@ public sealed class Game
 			{
 				ID = i + 1
 			};
-			AddResource(i + 1, Resource.GRAVITRONIUM, 999);
-			AddResource(i + 1, Resource.COBALT, 999);
-			AddResource(i + 1, Resource.OXYGEN, 999);
-			AddResource(i + 1, Resource.FOOD, 999);
-			AddResource(i + 1, Resource.WATER, 999);
 		}
 	}
 
