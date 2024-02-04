@@ -83,7 +83,9 @@
 			}
 			if (l is null)
 			{
-				NavManager.NavigateTo("/");
+				user.CurrentLobby = null;
+				await UserStore.UpdateUser(user, default);
+				NavManager.NavigateTo("/play");
 				return;
 			}
 		}
@@ -95,6 +97,7 @@
 	private Task LobbyUpdate(Lobby l)
 	{
 		Lobby = l;
+		StateHasChanged();
 		return Task.CompletedTask;
 	}
 
