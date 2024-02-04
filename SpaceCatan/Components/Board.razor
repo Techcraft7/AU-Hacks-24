@@ -27,25 +27,25 @@
 						</text>
 					}
 
-					@if (!RoadsToBuild.Contains(new(xCopy, yCopy, Direction.UP)))
+					@if (!ShowBuildIndicator(xCopy, yCopy, Direction.UP))
 					{
 						<text>
 							<text style="transform: scaleX(200%) rotate(180deg) translate(-25%, -10%); cursor: pointer; user-select: none;" dominant-baseline="middle" text-anchor="middle" stroke="white" fill="white" font-weight="bold" font-size="30px" @onclick="() => ClickRoad(xCopy, yCopy, Direction.UP)">V</text>
 						</text>
 					}
-					@if (!RoadsToBuild.Contains(new(xCopy, yCopy, Direction.DOWN)))
+					@if (!ShowBuildIndicator(xCopy, yCopy, Direction.DOWN))
 					{
 						<text>
 							<text style="transform: scaleX(200%) rotate(0deg) translate(25%, 90%); cursor: pointer; user-select: none;" dominant-baseline="middle" text-anchor="middle" stroke="white" fill="white" font-weight="bold" font-size="30px" @onclick="() => ClickRoad(xCopy, yCopy, Direction.DOWN)">V</text>
 						</text>
 					}
-					@if (!RoadsToBuild.Contains(new(xCopy, yCopy, Direction.LEFT)))
+					@if (!ShowBuildIndicator(xCopy, yCopy, Direction.LEFT))
 					{
 						<text>
 							<text style="transform: scaleY(200%) rotate(90deg) translate(25%, -10%); cursor: pointer; user-select: none;" dominant-baseline="middle" text-anchor="middle" stroke="white" fill="white" font-weight="bold" font-size="30px" @onclick="() => ClickRoad(xCopy, yCopy, Direction.LEFT)">V</text>
 						</text>
 					}
-					@if (!RoadsToBuild.Contains(new(xCopy, yCopy, Direction.RIGHT)))
+					@if (!ShowBuildIndicator(xCopy, yCopy, Direction.RIGHT))
 					{
 						<text>
 					<text style="transform: scaleY(200%) rotate(270deg) translate(-25%, 90%); cursor: pointer; user-select: none;" dominant-baseline="middle" text-anchor="middle" stroke="white" fill="white" font-weight="bold" font-size="30px" @onclick="() => ClickRoad(xCopy, yCopy, Direction.RIGHT)">V</text>
@@ -70,6 +70,11 @@
 	private void ClickPlanet(int x, int y)
 	{
 
+	}
+
+	private bool ShowBuildIndicator(int x, int y, Direction direction)
+	{
+		return RoadsToBuild.Contains(new(x, y, direction));
 	}
 
 	private void ClickRoad(int x, int y, Direction direction, bool onlyRemove = false)
