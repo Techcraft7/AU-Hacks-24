@@ -9,12 +9,23 @@
 
 <section class="section">
 	<div class="columns">
-		<div class="column"></div>
+		<div class="column">
+			TODO: resources
+		</div>
 		<div class="column is-three-fifths p-0">
 			<Board Map="@Lobby.Game.Map" />
 		</div>
 		<div class="column split">
-			<div class="log">actions</div>
+			<div class="log">
+				@if (Lobby.HasStarted)
+				{
+					<p>TODO: actions</p>
+				}
+				else
+				{
+					<p>Waiting for the game to start...</p>
+				}
+			</div>
 			<div class="bottom">
 				@foreach (string str in Lobby.Log)
 				{
