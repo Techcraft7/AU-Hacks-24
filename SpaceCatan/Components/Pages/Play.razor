@@ -114,9 +114,9 @@
 			Lobby = l;
 		}
 
-#if DEBUG
-	Logger.LogInformation($"Put user {user.ID} in lobby {Lobby.ID}");
-#endif
+// #if DEBUG
+// 	Logger.LogInformation($"Put user {user.ID} in lobby {Lobby.ID}");
+// #endif
 
 		Lobby.LobbyUpdated += LobbyUpdate;
 		StateHasChanged();
