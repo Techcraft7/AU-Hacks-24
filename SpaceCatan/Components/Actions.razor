@@ -8,7 +8,7 @@
             Use a Chaos Card?
         </label>
         <hr />
-        @if (resourceDeltas.Values.Sum() == 0)
+        @if (resourceDeltas.Values.All(x => x == 0))
         {
             <p>Current actions would use no resources</p>
         }
