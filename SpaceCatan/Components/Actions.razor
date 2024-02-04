@@ -1,7 +1,8 @@
 ﻿<div class="container">
 	<div class="actions">
-		<p>Buy Development Cards</p>
+		<p>Buy Chaos Cards</p>
 		<NumberPicker @ref="@Picker" />
+		<p class="help">1 Chaos Card = 1 Cobalt + 1 Food + 1 Water</p>
 	</div>
 	<button class="button is-success" disabled="@(!IsValidTurn)">End Turn</button>
 	@if (!IsValidTurn)
