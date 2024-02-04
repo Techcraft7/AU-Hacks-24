@@ -31,7 +31,7 @@
 			<div class="log box has-background-dark has-text-light">
 				@if (Lobby.HasStarted || true)
 				{
-					if (Lobby.HasStarted && Lobby.Game.CurrentPlayer == PlayerID)
+					if (true || Lobby.HasStarted && Lobby.Game.CurrentPlayer == PlayerID)
 					{
 						<Actions @ref="@actions" PlayerID="@PlayerID" User="@User" Lobby="@Lobby" RoadsToBuildRaw="@board?.RoadsToBuild" ColoniesToBuild="@board?.ColoniesToBuild" />
 					}
@@ -50,7 +50,7 @@
 						</p>
 						<br />
 						<p>
-							Build colonies by clicking on planets, and build roads by clicking on the "V" shapes.
+							Build colonies by clicking on planets, and build Hyperbridges by clicking on the "V" shapes.
 						</p>
 					}
 				}

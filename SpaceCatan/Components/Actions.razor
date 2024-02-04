@@ -21,6 +21,10 @@
             <p>
                 You cannot place your first Colony on an outpost or an empty planet
             </p>
+            <br />
+            <p>
+                Click a planet to place a Colony, then click one of the "V" shapes to build a Hyperbridge
+            </p>
         }
         else if (resourceDeltas.Values.All(x => x == 0))
         {
@@ -38,8 +42,11 @@
                 }
             </ul>
         }
-        <hr />
-        <button class="button is-link is-fullwidth" @onclick="() => {}">Exchange</button>
+        @if (!Lobby.Game.IsInSetup || true)
+        {
+            <hr />
+            <button class="button is-link is-fullwidth" @onclick="() => {}">Exchange</button>            
+        }
     </div>
 	<button class="button is-success" disabled="@(!IsValidTurn)" @onclick="OnEndTurn">End Turn</button>
 	@if (!IsValidTurn)
