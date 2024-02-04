@@ -80,7 +80,7 @@
 			(4, _, Direction.RIGHT) => false,
 			(_, 0, Direction.UP) => false,
 			(_, 4, Direction.DOWN) => false,
-			_ => !RoadsToBuild.Contains(new(x, y, direction)) && Game.Map.CanBuildRoadAt(x, y, direction, Game.CurrentPlayer)
+			_ => !RoadsToBuild.Contains(new(x, y, direction)) && Game.Map.CanBuildRoadAt(x, y, direction, Game.CurrentPlayer, RoadsToBuild)
 		};
 	}
 

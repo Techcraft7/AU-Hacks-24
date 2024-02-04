@@ -16,7 +16,7 @@ public static class CanBuildMapExtensions
 		return roads.Up == player || roads.Down == player || roads.Left == player || roads.Right == player;
 	}
 
-	public static bool CanBuildRoadAt(this Map map, int x, int y, Direction dir, int player)
+	public static bool CanBuildRoadAt(this Map map, int x, int y, Direction dir, int player, IReadOnlyList<RoadToBuild>? extraRoads = null)
 	{
 		if (x < 0 || y < 0 || x >= 5 || y >= 5)
 		{
@@ -32,6 +32,10 @@ public static class CanBuildMapExtensions
 		foreach (Direction i in allDirs)
 		{
 			if (map.GetRoad(x, y, i) == player)
+			{
+				return true;
+			}
+			if (extraRoads is not null && extraRoads.Contains(new(x, y, i)))
 			{
 				return true;
 			}
