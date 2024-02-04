@@ -9,14 +9,14 @@
 
 <section class="section">
 	<div class="columns">
-		<div class="column">
+		<div class="column box has-background-dark has-text-light">
 			TODO: resources
 		</div>
 		<div class="column is-three-fifths p-0">
 			<Board Map="@Lobby.Game.Map" />
 		</div>
 		<div class="column split">
-			<div class="log">
+			<div class="log box has-background-dark has-text-light">
 				@if (Lobby.HasStarted)
 				{
 					<p>TODO: actions</p>
@@ -26,7 +26,7 @@
 					<p>Waiting for the game to start...</p>
 				}
 			</div>
-			<div class="bottom">
+			<div class="bottom box has-background-dark has-text-light">
 				@foreach (string str in Lobby.Log)
 				{
 					<p>@str</p>
@@ -40,13 +40,14 @@
 	[CascadingParameter]
 	public Task<AuthenticationState> AuthenticationStateTask { get; set; } = null!;
 	private Lobby Lobby { get; set; } = new();
+	private string UserID { get; set; } = "";
 
 	protected override async Task OnInitializedAsync()
 	{
 		var auth = await AuthenticationStateTask;
-		string userID = auth.User.FindFirst("id")?.Value ?? string.Empty;
+		UserID = auth.User.FindFirst("id")?.Value ?? string.Empty;
 
-		var (user, error) = await UserStore.GetUser(userID, default);
+		var (user, error) = await UserStore.GetUser(UserID, default);
 		if (error is not null)
 		{
 			Logger.LogError(error, "Failed to get user data");
