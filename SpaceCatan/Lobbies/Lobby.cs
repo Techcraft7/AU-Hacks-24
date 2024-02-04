@@ -9,7 +9,7 @@ public sealed class Lobby
 	public IReadOnlyList<string> Log => log;
 	public event Func<Lobby, Task>? LobbyUpdated;
 	private readonly SemaphoreSlim semaphore = new(1);
-	private readonly List<string> log = ["Waiting: 0/4"];
+	private readonly List<string> log = [];
 
 	public async Task<bool> TryAddPlayer(User user)
 	{

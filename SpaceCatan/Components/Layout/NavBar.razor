@@ -6,6 +6,18 @@
 	</div>
 	<div id="navbar" class="navbar-menu has-background-grey-darker">
 		<div class="navbar-start">
+			<AuthorizeView>
+				<Authorized>
+					<div class="navbar-item">
+						<a class="has-text-light" href="/play">Join Game</a>
+					</div>
+				</Authorized>
+				<NotAuthorized>
+					<div class="navbar-item">
+						<a class="has-text-light" href="/login?redirectUri=/play">Join Game</a>
+					</div>
+				</NotAuthorized>
+			</AuthorizeView>
 		</div>
 		<div class="navbar-end">
 			<AuthorizeView>
