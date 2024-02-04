@@ -61,6 +61,11 @@ public sealed class Game
 		resources[Resource.OXYGEN] -= 1 * turn.Colonies.Length;
 		resources[Resource.FOOD] -= 1 * turn.Colonies.Length;
 
+		// Development Cards
+		resources[Resource.COBALT] -= 1 * turn.DevelopmentCardsBought;
+		resources[Resource.FOOD] -= 1 * turn.DevelopmentCardsBought;
+		resources[Resource.WATER] -= 1 * turn.DevelopmentCardsBought;
+
 		// Update resource counds
 		p.Gravitronium += resources[Resource.GRAVITRONIUM];
 		p.Cobalt += resources[Resource.COBALT];
